@@ -60,9 +60,15 @@ end;
 procedure TFormMain.fresh;
 var
   Desktop: HDC;
-  _handle: Cardinal;
+  _handle, _handleForeground: Cardinal;
 begin
   _handle := getHandle();
+  _handleForeground := GetForegroundWindow;
+
+  if(_handle = _handleForeground)then
+    BorderWidth := 2
+  else
+    BorderWidth := 0;
 
   Desktop := GetWindowDC(_handle);
 
@@ -79,6 +85,8 @@ var
   param, key, value: string;
   pair: array of string;
 begin
+  Color := clLime;
+
   SetLength(pair, 2);
 
   for index := 1 to ParamCount do begin
