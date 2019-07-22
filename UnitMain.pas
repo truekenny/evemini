@@ -125,7 +125,11 @@ end;
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if Button = mbLeft then SetForegroundWindow(getHandle)
+  if Button = mbLeft then begin
+    SetForegroundWindow(getHandle);
+    Application.ProcessMessages;
+    fresh;
+  end
   else if Button = mbMiddle then Close();
 end;
 
