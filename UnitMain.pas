@@ -63,6 +63,12 @@ var
   _handle, _handleForeground: Cardinal;
 begin
   _handle := getHandle();
+
+  if _handle = 0 then
+    Visible := false
+  else
+    Visible := true;
+
   _handleForeground := GetForegroundWindow;
 
   if(_handle = _handleForeground)then
@@ -107,7 +113,7 @@ begin
     else if key = '--game-y' then gameY := StrToInt(value);
   end;
 
-  // capsuleerName := '123';
+  //capsuleerName := '123';
 end;
 
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
