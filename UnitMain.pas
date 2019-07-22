@@ -76,6 +76,8 @@ begin
   else
     BorderWidth := 0;
 
+  Application.ProcessMessages;
+
   Desktop := GetWindowDC(_handle);
 
   try
@@ -110,7 +112,8 @@ begin
     else if key = '--form-width' then FormMain.Width := StrToInt(value)
     else if key = '--form-height' then FormMain.Height := StrToInt(value)
     else if key = '--game-x' then gameX := StrToInt(value)
-    else if key = '--game-y' then gameY := StrToInt(value);
+    else if key = '--game-y' then gameY := StrToInt(value)
+    else if key = '--timer' then Timer.Interval := StrToInt(value);
   end;
 
   //capsuleerName := '123';
