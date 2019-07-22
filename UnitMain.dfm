@@ -23,4 +23,8 @@ object FormMain: TFormMain
     Left = 8
     Top = 8
   end
+  object XPManifest: TXPManifest
+    Left = 48
+    Top = 8
+  end
 end

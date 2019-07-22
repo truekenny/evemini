@@ -4,11 +4,12 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.XPMan;
 
 type
   TFormMain = class(TForm)
     Timer: TTimer;
+    XPManifest: TXPManifest;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -59,13 +60,15 @@ end;
 
 procedure TFormMain.fresh;
 var
-  Desktop: HDC;
+  Game: HDC;
   _handle, _handleForeground: Cardinal;
 begin
   _handle := getHandle();
 
-  if _handle = 0 then
-    Visible := false
+  if _handle = 0 then begin
+    Visible := false;
+    Exit;
+  end
   else
     Visible := true;
 
@@ -78,12 +81,12 @@ begin
 
   Application.ProcessMessages;
 
-  Desktop := GetWindowDC(_handle);
+  Game := GetWindowDC(_handle);
 
   try
-    BitBlt(FormMain.Canvas.Handle, 0, 0, FormMain.Width, FormMain.Height, Desktop, gameX, gameY, SRCCOPY);
+    BitBlt(FormMain.Canvas.Handle, 0, 0, FormMain.Width, FormMain.Height, Game, gameX, gameY, SRCCOPY);
   finally
-    ReleaseDC(0, Desktop);
+    ReleaseDC(0, Game);
   end;
 end;
 
