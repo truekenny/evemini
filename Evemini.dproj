@@ -69,7 +69,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_RunParams>--name=&quot;Lass Suicide&quot; --form-x=200 --form-y=100 --form-width=400 --form-height=200 --game-x=300 --game-y=400</Debugger_RunParams>
+        <Debugger_RunParams>--name=&quot;Elle Tan&quot; --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=1866 --game-y=550</Debugger_RunParams>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>

@@ -4,19 +4,20 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TFormMain = class(TForm)
-    Button1: TButton;
-    procedure Button1Click(Sender: TObject);
+    Timer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure TimerTimer(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
     function getHandle(): Cardinal;
+    procedure fresh();
   public
     { Public declarations }
   end;
@@ -33,7 +34,13 @@ implementation
 
 function TFormMain.getHandle(): Cardinal;
 begin
-  Result := FindWindow('triuiScreen', PChar('EVE - ' + capsuleerName));
+//  Result := FindWindow('triuiScreen', PChar('EVE - ' + capsuleerName));
+  Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+end;
+
+procedure TFormMain.TimerTimer(Sender: TObject);
+begin
+  fresh;
 end;
 
 procedure TFormMain.explode(var a: array of string; Border, S: string);
@@ -50,13 +57,17 @@ begin
   until S2 = '';
 end;
 
-procedure TFormMain.Button1Click(Sender: TObject);
+procedure TFormMain.fresh;
 var
   Desktop: HDC;
+  _handle: Cardinal;
 begin
-  Desktop := GetWindowDC(getHandle());
+  _handle := getHandle();
+
+  Desktop := GetWindowDC(_handle);
+
   try
-    BitBlt(FormMain.Canvas.Handle, 0, 0, FormMain.Width, FormMain.Height, Desktop, 100, 0, SRCCOPY);
+    BitBlt(FormMain.Canvas.Handle, 0, 0, FormMain.Width, FormMain.Height, Desktop, gameX, gameY, SRCCOPY);
   finally
     ReleaseDC(0, Desktop);
   end;
@@ -88,8 +99,7 @@ begin
     else if key = '--game-y' then gameY := StrToInt(value);
   end;
 
-  Left := 100;
-  Top := 100;
+  // capsuleerName := '123';
 end;
 
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -97,7 +107,6 @@ procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   if Button = mbLeft then SetForegroundWindow(getHandle)
   else if Button = mbMiddle then Close();
-
 end;
 
 end.

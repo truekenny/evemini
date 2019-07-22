@@ -3,3 +3,4 @@
 *.local
 *.identcache
 *.exe
+go.bat
