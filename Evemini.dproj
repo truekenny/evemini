@@ -69,6 +69,9 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Icon_MainIcon>Evemini_Icon.ico</Icon_MainIcon>
         <Debugger_RunParams>--name=&quot;Grimen&quot; --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=1866 --game-y=550</Debugger_RunParams>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
