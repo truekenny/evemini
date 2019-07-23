@@ -4,21 +4,24 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.XPMan;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.XPMan, DwmApi;
 
 type
   TFormMain = class(TForm)
     Timer: TTimer;
-    XPManifest: TXPManifest;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
     function getHandle(): Cardinal;
     procedure fresh();
+    procedure registerThumbnail();
+
   public
     { Public declarations }
   end;
@@ -27,7 +30,7 @@ var
   FormMain: TFormMain;
   capsuleerName: string;
   gameX, gameY: Integer;
-
+  gameHandle: Cardinal = 0;
 
 implementation
 
@@ -35,11 +38,16 @@ implementation
 
 function TFormMain.getHandle(): Cardinal;
 begin
-//  Result := FindWindow('triuiScreen', PChar('EVE - ' + capsuleerName));
-  Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+  // Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+  Result := FindWindow(nil, 'PuTTY Configuration');
 end;
 
 procedure TFormMain.TimerTimer(Sender: TObject);
+begin
+  fresh;
+end;
+
+procedure TFormMain.Button1Click(Sender: TObject);
 begin
   fresh;
 end;
@@ -66,7 +74,9 @@ begin
   _handle := getHandle();
 
   if _handle = 0 then begin
-    Visible := false;
+
+    gameHandle := 0;
+//    Visible := false;
     Exit;
   end
   else
@@ -79,15 +89,43 @@ begin
   else
     BorderWidth := 0;
 
-  Application.ProcessMessages;
+  if (gameHandle = 0) and (_handle <> 0) then begin
+    gameHandle := _handle;
 
-  Game := GetWindowDC(_handle);
-
-  try
-    BitBlt(FormMain.Canvas.Handle, 0, 0, FormMain.Width, FormMain.Height, Game, gameX, gameY, SRCCOPY);
-  finally
-    ReleaseDC(0, Game);
+    registerThumbnail;
   end;
+end;
+
+procedure TFormMain.registerThumbnail();
+var
+    Props: DWM_THUMBNAIL_PROPERTIES;
+    ProgmanHandle: THandle;
+  PH: HTHUMBNAIL;
+
+
+begin
+  ProgmanHandle := gameHandle;
+  if ProgmanHandle>0 then
+    begin
+      if Succeeded(DwmRegisterThumbnail(Handle,ProgmanHandle,@PH))then
+         begin
+           Props.dwFlags:=DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
+                          DWM_TNP_OPACITY or DWM_TNP_RECTDESTINATION;
+
+           Props.fSourceClientAreaOnly := false;
+           Props.fVisible := true;
+           Props.opacity := 255;
+           Props.rcDestination := FormMain.ClientRect;
+           if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then
+             // ShowMessage('Thumbnail готов')
+           else
+            // ShowMessage('DwmUpdateThumbnailProperties false');
+         end
+      else
+        begin
+         // ShowMessage('DwmRegisterThumbnail False ');
+        end;
+    end;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
@@ -127,8 +165,6 @@ procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   if Button = mbLeft then begin
     SetForegroundWindow(getHandle);
-    Application.ProcessMessages;
-    fresh;
   end
   else if Button = mbMiddle then Close();
 end;
