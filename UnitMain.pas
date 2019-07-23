@@ -9,12 +9,10 @@ uses
 type
   TFormMain = class(TForm)
     Timer: TTimer;
-    Button1: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -38,16 +36,11 @@ implementation
 
 function TFormMain.getHandle(): Cardinal;
 begin
-  // Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
-  Result := FindWindow(nil, 'PuTTY Configuration');
+  Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+  // Result := FindWindow(nil, 'PuTTY Configuration');
 end;
 
 procedure TFormMain.TimerTimer(Sender: TObject);
-begin
-  fresh;
-end;
-
-procedure TFormMain.Button1Click(Sender: TObject);
 begin
   fresh;
 end;
@@ -110,20 +103,24 @@ begin
       if Succeeded(DwmRegisterThumbnail(Handle,ProgmanHandle,@PH))then
          begin
            Props.dwFlags:=DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
-                          DWM_TNP_OPACITY or DWM_TNP_RECTDESTINATION;
+                          DWM_TNP_OPACITY or DWM_TNP_RECTDESTINATION or
+                          DWM_TNP_RECTSOURCE;
 
-           Props.fSourceClientAreaOnly := false;
+           Props.fSourceClientAreaOnly := true;
            Props.fVisible := true;
            Props.opacity := 255;
            Props.rcDestination := FormMain.ClientRect;
-           if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then
+           Props.rcSource := Rect(Point(gameX ,gameY) ,Point(gameX + FormMain.Width,gameY + FormMain.Height));
+           //Props.rcSource := Rect(30,30,100,100);
+           if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
              // ShowMessage('Thumbnail готов')
-           else
-            // ShowMessage('DwmUpdateThumbnailProperties false');
+           end else begin
+              ShowMessage('DwmUpdateThumbnailProperties false');
+           end;
          end
       else
         begin
-         // ShowMessage('DwmRegisterThumbnail False ');
+           ShowMessage('DwmRegisterThumbnail False ');
         end;
     end;
 end;

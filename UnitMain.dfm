@@ -17,15 +17,6 @@ object FormMain: TFormMain
   OnMouseDown = FormMouseDown
   PixelsPerInch = 96
   TextHeight = 13
-  object Button1: TButton
-    Left = 80
-    Top = 128
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 0
-    OnClick = Button1Click
-  end
   object Timer: TTimer
     OnTimer = TimerTimer
     Left = 8
