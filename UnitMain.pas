@@ -181,6 +181,7 @@ begin
 
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
+  Caption := 'Evemini - ' + capsuleerName;
 end;
 
 procedure TFormMain.FormDblClick(Sender: TObject);
