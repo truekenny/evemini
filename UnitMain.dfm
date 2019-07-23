@@ -13,8 +13,10 @@ object FormMain: TFormMain
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
+  OnActivate = FormActivate
   OnCreate = FormCreate
   OnMouseDown = FormMouseDown
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Timer: TTimer

@@ -13,6 +13,9 @@ type
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -141,6 +144,11 @@ begin
    end;
 end;
 
+procedure TFormMain.FormActivate(Sender: TObject);
+begin
+  ShowWindow(Application.Handle, SW_HIDE);
+end;
+
 procedure TFormMain.FormCreate(Sender: TObject);
 var
   index: Integer;
@@ -170,8 +178,6 @@ begin
 
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
-
-  //capsuleerName := '123';
 end;
 
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -181,6 +187,11 @@ begin
     SetForegroundWindow(getHandle);
   end
   else if Button = mbMiddle then Close();
+end;
+
+procedure TFormMain.FormShow(Sender: TObject);
+begin
+  ShowWindow(Application.Handle, SW_HIDE);
 end;
 
 end.
