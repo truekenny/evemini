@@ -19,6 +19,7 @@ type
     function getHandle(): Cardinal;
     procedure fresh();
     procedure registerThumbnail();
+    procedure borderThumbnail(withBorder: Boolean);
 
   public
     { Public declarations }
@@ -29,6 +30,7 @@ var
   capsuleerName: string;
   gameX, gameY: Integer;
   gameHandle: Cardinal = 0;
+  PH: HTHUMBNAIL;
 
 implementation
 
@@ -61,7 +63,6 @@ end;
 
 procedure TFormMain.fresh;
 var
-  Game: HDC;
   _handle, _handleForeground: Cardinal;
 begin
   _handle := getHandle();
@@ -75,27 +76,24 @@ begin
   else
     Visible := true;
 
-  _handleForeground := GetForegroundWindow;
-
-  if(_handle = _handleForeground)then
-    BorderWidth := 2
-  else
-    BorderWidth := 0;
 
   if (gameHandle = 0) and (_handle <> 0) then begin
     gameHandle := _handle;
 
     registerThumbnail;
   end;
+
+  if _handle <> 0 then begin
+    _handleForeground := GetForegroundWindow;
+
+    borderThumbnail(_handle = _handleForeground);
+  end;
 end;
 
 procedure TFormMain.registerThumbnail();
 var
-    Props: DWM_THUMBNAIL_PROPERTIES;
-    ProgmanHandle: THandle;
-  PH: HTHUMBNAIL;
-
-
+  Props: DWM_THUMBNAIL_PROPERTIES;
+  ProgmanHandle: THandle;
 begin
   ProgmanHandle := gameHandle;
   if ProgmanHandle>0 then
@@ -109,20 +107,38 @@ begin
            Props.fSourceClientAreaOnly := true;
            Props.fVisible := true;
            Props.opacity := 255;
-           Props.rcDestination := FormMain.ClientRect;
+           Props.rcDestination := Rect(3,3,Width - 3,Height-3);
            Props.rcSource := Rect(Point(gameX ,gameY) ,Point(gameX + FormMain.Width,gameY + FormMain.Height));
-           //Props.rcSource := Rect(30,30,100,100);
            if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
-             // ShowMessage('Thumbnail готов')
+             Color := clLime;
            end else begin
-              ShowMessage('DwmUpdateThumbnailProperties false');
+              ShowMessage('DwmUpdateThumbnailProperties fail');
            end;
          end
       else
         begin
-           ShowMessage('DwmRegisterThumbnail False ');
+           ShowMessage('DwmRegisterThumbnail fail');
         end;
     end;
+end;
+
+procedure TFormMain.borderThumbnail(withBorder: Boolean);
+var
+  Props: DWM_THUMBNAIL_PROPERTIES;
+  borderWidth: Integer;
+begin
+   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
+
+  if withBorder then borderWidth := 3 else borderWidth := 0;
+
+   Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
+   Props.rcSource := Rect(
+    Point(gameX + borderWidth ,gameY + borderWidth),
+    Point(gameX + FormMain.Width - borderWidth, gameY + FormMain.Height - borderWidth)
+    );
+   if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
+      ShowMessage('DwmUpdateThumbnailProperties (border) fail');
+   end;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
@@ -131,8 +147,6 @@ var
   param, key, value: string;
   pair: array of string;
 begin
-  Color := clLime;
-
   SetLength(pair, 2);
 
   for index := 1 to ParamCount do begin

@@ -4,7 +4,7 @@ object FormMain: TFormMain
   BorderStyle = bsNone
   Caption = 'FormMain'
   ClientHeight = 450
-  ClientWidth = 868
+  ClientWidth = 870
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,6 +18,7 @@ object FormMain: TFormMain
   PixelsPerInch = 96
   TextHeight = 13
   object Timer: TTimer
+    Interval = 100
     OnTimer = TimerTimer
     Left = 8
     Top = 8
