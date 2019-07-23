@@ -15,6 +15,7 @@ type
     procedure TimerTimer(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormDblClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -132,7 +133,9 @@ var
 begin
    Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
-  if withBorder then borderWidth := 3 else borderWidth := 0;
+  if withBorder and (WindowState <> wsMaximized)
+  then borderWidth := 3
+  else borderWidth := 0;
 
    Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
    Props.rcSource := Rect(
@@ -178,6 +181,15 @@ begin
 
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
+end;
+
+procedure TFormMain.FormDblClick(Sender: TObject);
+begin
+  if WindowState = wsMaximized then begin
+    WindowState := wsNormal;
+  end else begin
+    WindowState := wsMaximized;
+  end;
 end;
 
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;

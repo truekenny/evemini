@@ -15,6 +15,7 @@ object FormMain: TFormMain
   OldCreateOrder = False
   OnActivate = FormActivate
   OnCreate = FormCreate
+  OnDblClick = FormDblClick
   OnMouseDown = FormMouseDown
   OnShow = FormShow
   PixelsPerInch = 96
