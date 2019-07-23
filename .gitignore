@@ -3,5 +3,5 @@
 *.local
 *.identcache
 *.exe
-go.bat
+run.bat
 Evemini.stat
