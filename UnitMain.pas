@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.XPMan, DwmApi;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi;
 
 type
   TFormMain = class(TForm)
@@ -28,7 +28,10 @@ type
 var
   FormMain: TFormMain;
   capsuleerName: string;
-  gameX, gameY: Integer;
+  gameX: Integer = 0;
+  gameY: Integer = 0;
+  gameWidth: Integer = 0;
+  gameHeight: Integer = 0;
   gameHandle: Cardinal = 0;
   PH: HTHUMBNAIL;
 
@@ -39,7 +42,6 @@ implementation
 function TFormMain.getHandle(): Cardinal;
 begin
   Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
-  // Result := FindWindow(nil, 'PuTTY Configuration');
 end;
 
 procedure TFormMain.TimerTimer(Sender: TObject);
@@ -70,7 +72,7 @@ begin
   if _handle = 0 then begin
 
     gameHandle := 0;
-//    Visible := false;
+    Visible := false;
     Exit;
   end
   else
@@ -101,14 +103,12 @@ begin
       if Succeeded(DwmRegisterThumbnail(Handle,ProgmanHandle,@PH))then
          begin
            Props.dwFlags:=DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
-                          DWM_TNP_OPACITY or DWM_TNP_RECTDESTINATION or
-                          DWM_TNP_RECTSOURCE;
+                          DWM_TNP_OPACITY;
 
            Props.fSourceClientAreaOnly := true;
            Props.fVisible := true;
            Props.opacity := 255;
-           Props.rcDestination := Rect(3,3,Width - 3,Height-3);
-           Props.rcSource := Rect(Point(gameX ,gameY) ,Point(gameX + FormMain.Width,gameY + FormMain.Height));
+
            if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
              Color := clLime;
            end else begin
@@ -134,7 +134,7 @@ begin
    Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
    Props.rcSource := Rect(
     Point(gameX + borderWidth ,gameY + borderWidth),
-    Point(gameX + FormMain.Width - borderWidth, gameY + FormMain.Height - borderWidth)
+    Point(gameX + gameWidth - borderWidth, gameY + gameHeight - borderWidth)
     );
    if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
       ShowMessage('DwmUpdateThumbnailProperties (border) fail');
@@ -156,17 +156,20 @@ begin
     key := pair[0];
     value := pair[1];
 
-    // --name="Lass Suicide" --form-x=200 --form-y=100 --form-width=400 --form-height=200 --game-x=300 --game-y=400
-
     if key = '--name' then capsuleerName := value
-    else if key = '--form-x' then FormMain.Left := StrToInt(value)
-    else if key = '--form-y' then FormMain.Top := StrToInt(value)
-    else if key = '--form-width' then FormMain.Width := StrToInt(value)
-    else if key = '--form-height' then FormMain.Height := StrToInt(value)
+    else if key = '--form-x' then Left := StrToInt(value)
+    else if key = '--form-y' then Top := StrToInt(value)
+    else if key = '--form-width' then Width := StrToInt(value)
+    else if key = '--form-height' then Height := StrToInt(value)
     else if key = '--game-x' then gameX := StrToInt(value)
     else if key = '--game-y' then gameY := StrToInt(value)
+    else if key = '--game-width' then gameWidth := StrToInt(value)
+    else if key = '--game-height' then gameHeight := StrToInt(value)
     else if key = '--timer' then Timer.Interval := StrToInt(value);
   end;
+
+  if gameWidth = 0 then gameWidth := Width;
+  if gameHeight = 0 then gameHeight := Height;
 
   //capsuleerName := '123';
 end;
