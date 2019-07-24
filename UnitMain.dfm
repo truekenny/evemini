@@ -3,8 +3,8 @@ object FormMain: TFormMain
   Top = 0
   BorderStyle = bsNone
   Caption = 'FormMain'
-  ClientHeight = 450
-  ClientWidth = 870
+  ClientHeight = 178
+  ClientWidth = 303
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,6 +13,7 @@ object FormMain: TFormMain
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
+  Position = poDesktopCenter
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDblClick = FormDblClick

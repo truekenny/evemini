@@ -31,14 +31,15 @@ type
 
 var
   FormMain: TFormMain;
-  capsuleerName: string;
+  windowName: string;
   gameX: Integer = 0;
   gameY: Integer = 0;
   gameWidth: Integer = 0;
   gameHeight: Integer = 0;
   gameHandle: Cardinal = 0;
-  alwaysVisible: Boolean = false;
+  alwaysVisible: Boolean = False;
   PH: HTHUMBNAIL;
+  readyToWork: Boolean = False;
 
 implementation
 
@@ -46,7 +47,7 @@ implementation
 
 function TFormMain.getHandle(): Cardinal;
 begin
-  Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+  Result := FindWindow(nil, PChar(windowName));
   // Result := FindWindow(nil, 'Calculator');
 end;
 
@@ -73,6 +74,7 @@ procedure TFormMain.fresh;
 var
   _handle: Cardinal;
 begin
+  if not readyToWork then Exit;
 
   if (gameHandle <> 0) and IsWindow(gameHandle) then begin
     // already active
@@ -174,7 +176,12 @@ begin
     key := pair[0];
     value := pair[1];
 
-    if key = '--name' then capsuleerName := value
+    // --name="Elle Tan" --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=10 --game-y=10 --always-visible=true
+
+    if key = '--name' then begin
+      windowName := 'EVE - ' + value;
+      readyToWork := True;
+    end
     else if key = '--form-x' then Left := StrToInt(value)
     else if key = '--form-y' then Top := StrToInt(value)
     else if key = '--form-width' then Width := StrToInt(value)
@@ -189,7 +196,8 @@ begin
 
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
-  Caption := 'Evemini - ' + capsuleerName;
+
+  Caption := 'Evemini - ' + windowName;
 end;
 
 procedure TFormMain.FormDblClick(Sender: TObject);
