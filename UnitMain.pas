@@ -4,11 +4,17 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
+  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
 
 type
   TFormMain = class(TForm)
     Timer: TTimer;
+    PopupActionBar: TPopupActionBar;
+    menuSelectWindow: TMenuItem;
+    menuDefault: TMenuItem;
+    N11: TMenuItem;
+    N21: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -18,7 +24,11 @@ type
     procedure FormDblClick(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-   procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+
+    function enumListOfTasks(hWindow: hWnd): Bool;  export;
+    procedure PopupActionBarPopup(Sender: TObject);
+    procedure menuDefaultClick(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -29,6 +39,12 @@ type
 
   public
     { Public declarations }
+  end;
+
+  THoldhWnd = class(TObject)
+  private
+  public
+    hWindow: hWnd;
   end;
 
 var
@@ -189,13 +205,86 @@ begin
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
 
-  // TODO 1 -cImportant: delete
+  // TODO: Delete
   if True then begin
     windowName := 'Calculator';
     readyToWork := true;
   end;
 
-  Caption := 'Evemini - ' + windowName;
+  if windowName = '' then
+    Caption := 'Evemini'
+  else
+    Caption := 'Evemini - ' + windowName;
+end;
+
+procedure TFormMain.menuDefaultClick(Sender: TObject);
+begin
+  //
+  ShowMessage(IntToStr((Sender as TMenuItem).Tag));
+end;
+
+procedure TFormMain.PopupActionBarPopup(Sender: TObject);
+var
+  index : Integer;
+
+  // TODO: Delete
+  menuItem : TMenuItem;
+begin
+  // Удаляем всё
+  for index := 1 to menuSelectWindow.Count - 1 do begin
+    menuSelectWindow.Delete(1);
+  end;
+
+  menuItem := TMenuItem.Create(menuSelectWindow);
+  menuItem.Caption := '1';
+  menuItem.OnClick := menuDefaultClick;
+  menuItem.Tag := 1;
+  menuSelectWindow.Add(menuItem);
+
+  menuItem := TMenuItem.Create(menuSelectWindow);
+  menuItem.Caption := '2';
+  menuItem.OnClick := menuDefaultClick;
+  menuItem.Tag := 2;
+  menuSelectWindow.Add(menuItem);
+
+
+  enumWindows(@TFormMain.EnumListOfTasks, LPARAM(Self));
+end;
+
+function TFormMain.enumListOfTasks(hWindow: hWnd): Bool;
+var
+  HoldString: PChar;
+  WindowStyle: Longint;
+  IsAChild: Word;
+  HoldhWnd: THoldhWnd;
+
+  menuItem : TMenuItem;
+begin
+  GetMem(HoldString, 256);
+
+  HoldhWnd := THoldhWnd.Create;
+  HoldhWnd.hWindow := hWindow;
+
+  WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
+  WindowStyle := WindowStyle and Longint(WS_VISIBLE);
+  IsAChild := GetWindowWord(hWindow, GWL_HWNDPARENT);
+
+  if (GetWindowText(hWindow, HoldString, 255) > 0)
+    and (WindowStyle > 0)
+    and (IsAChild = Word(nil))
+    then begin
+        ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
+
+        //menuItem := TMenuItem.Create(_menuSelectWindow);
+        //menuItem.Caption := StrPas(HoldString);
+        //menuItem.OnClick := menuDefaultClick;
+        //menuItem.Tag := hWindow;
+        //_menuSelectWindow.Add(menuItem);
+    end;
+
+  FreeMem(HoldString, 256);
+  HoldhWnd := nil;
+  Result := True;
 end;
 
 procedure TFormMain.FormDblClick(Sender: TObject);

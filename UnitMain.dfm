@@ -13,6 +13,7 @@ object FormMain: TFormMain
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
+  PopupMenu = PopupActionBar
   Position = poDesktopCenter
   OnActivate = FormActivate
   OnCreate = FormCreate
@@ -27,5 +28,24 @@ object FormMain: TFormMain
     OnTimer = TimerTimer
     Left = 8
     Top = 8
+  end
+  object PopupActionBar: TPopupActionBar
+    OnPopup = PopupActionBarPopup
+    Left = 88
+    Top = 24
+    object menuSelectWindow: TMenuItem
+      Caption = 'Select Window'
+      object menuDefault: TMenuItem
+        Caption = 'None'
+        Enabled = False
+        OnClick = menuDefaultClick
+      end
+      object N11: TMenuItem
+        Caption = '1'
+      end
+      object N21: TMenuItem
+        Caption = '2'
+      end
+    end
   end
 end
