@@ -210,6 +210,12 @@ end;
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  // Move form
+  if Button = mbLeft then begin
+    ReleaseCapture;
+    SendMessage(Handle, WM_SYSCOMMAND, 61458, 0) ;
+  end;
+
   if Button = mbLeft then begin
     SetForegroundWindow(getHandle);
   end
@@ -231,6 +237,7 @@ begin
   Height := Height - delta * 2;
 end;
 
+// Resize bsNone
 procedure TFormMain.WMNCHitTest(var Message: TWMNCHitTest);
 const
   EDGEDETECT = 7; // adjust
