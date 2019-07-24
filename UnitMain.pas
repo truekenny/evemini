@@ -47,6 +47,7 @@ implementation
 function TFormMain.getHandle(): Cardinal;
 begin
   Result := FindWindow(nil, PChar('EVE - ' + capsuleerName));
+  // Result := FindWindow(nil, 'Calculator');
 end;
 
 procedure TFormMain.TimerTimer(Sender: TObject);
@@ -70,30 +71,31 @@ end;
 
 procedure TFormMain.fresh;
 var
-  _handle, _handleForeground: Cardinal;
+  _handle: Cardinal;
 begin
-  _handle := getHandle();
 
-  if _handle = 0 then begin
+  if (gameHandle <> 0) and IsWindow(gameHandle) then begin
+    // already active
+    borderThumbnail(gameHandle = GetForegroundWindow);
+
+  end else begin
+    // not active
     gameHandle := 0;
-    if not alwaysVisible then Visible := false;
-    Color := clBtnFace;
-    Exit;
-  end
-  else
-    Visible := true;
+    _handle := getHandle();
 
+    if _handle = 0 then begin
+      // cant activate
+      if not alwaysVisible then Visible := false;
+      Color := clBtnFace;
 
-  if (gameHandle = 0) and (_handle <> 0) then begin
-    gameHandle := _handle;
+    end else begin
+      // window found, can activate
+      Visible := true;
+      gameHandle := _handle;
 
-    registerThumbnail;
-  end;
+      registerThumbnail;
 
-  if _handle <> 0 then begin
-    _handleForeground := GetForegroundWindow;
-
-    borderThumbnail(_handle = _handleForeground);
+    end;
   end;
 end;
 
@@ -117,12 +119,12 @@ begin
            if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
              Color := clLime;
            end else begin
-              ShowMessage('DwmUpdateThumbnailProperties fail');
+              ShowMessage('Properties fail');
            end;
          end
       else
         begin
-           ShowMessage('DwmRegisterThumbnail fail');
+           ShowMessage('General fail');
         end;
     end;
 end;
@@ -144,7 +146,7 @@ begin
     Point(gameX + gameWidth - borderWidth, gameY + gameHeight - borderWidth)
     );
    if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
-      ShowMessage('DwmUpdateThumbnailProperties (border) fail');
+      ShowMessage('Properties (border) fail');
    end;
 end;
 
