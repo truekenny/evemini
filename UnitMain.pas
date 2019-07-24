@@ -137,11 +137,13 @@ begin
              Color := clLime;
            end else begin
               ShowMessage('Properties fail');
+              Close();
            end;
          end
       else
         begin
-           ShowMessage('General fail');
+          ShowMessage('General fail');
+          Close();
         end;
     end;
 end;
@@ -164,6 +166,7 @@ begin
     );
    if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
       ShowMessage('Properties (border) fail');
+      Close();
    end;
 end;
 
@@ -217,10 +220,13 @@ end;
 
 procedure TFormMain.menuDefaultClick(Sender: TObject);
 begin
-  //
-  ShowMessage(IntToStr((Sender as TMenuItem).Tag));
+  DwmUnregisterThumbnail(PH);
+  gameHandle := 0;
+  windowName := (Sender as TMenuItem).Caption;
+  readyToWork := true;
 end;
 
+// Global
 function EnumWindowsProc(hWindow: HWND): Bool; stdcall;
 var
   HoldString: PChar;
@@ -260,29 +266,13 @@ end;
 procedure TFormMain.PopupActionBarPopup(Sender: TObject);
 var
   index : Integer;
-
-  // TODO: Delete
-  menuItem : TMenuItem;
 begin
   // Удаляем всё
   for index := 1 to menuSelectWindow.Count - 1 do begin
     menuSelectWindow.Delete(1);
   end;
 
-  menuItem := TMenuItem.Create(menuSelectWindow);
-  menuItem.Caption := '1';
-  menuItem.OnClick := menuDefaultClick;
-  menuItem.Tag := 1;
-  menuSelectWindow.Add(menuItem);
-
-  menuItem := TMenuItem.Create(menuSelectWindow);
-  menuItem.Caption := '2';
-  menuItem.OnClick := menuDefaultClick;
-  menuItem.Tag := 2;
-  menuSelectWindow.Add(menuItem);
-
-
-  EnumWindows(@EnumWindowsProc,0);
+  EnumWindows(@EnumWindowsProc, 0);
 end;
 
 procedure TFormMain.FormDblClick(Sender: TObject);
