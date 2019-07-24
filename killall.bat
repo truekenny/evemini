@@ -1,1 +1,1 @@
-taskkill /IM Evemini.exe
+taskkill /F /IM Evemini.exe
