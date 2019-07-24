@@ -37,6 +37,7 @@ var
   gameWidth: Integer = 0;
   gameHeight: Integer = 0;
   gameHandle: Cardinal = 0;
+  alwaysVisible: Boolean = false;
   PH: HTHUMBNAIL;
 
 implementation
@@ -74,9 +75,9 @@ begin
   _handle := getHandle();
 
   if _handle = 0 then begin
-
     gameHandle := 0;
-    Visible := false;
+    if not alwaysVisible then Visible := false;
+    Color := clBtnFace;
     Exit;
   end
   else
@@ -176,7 +177,8 @@ begin
     else if key = '--game-y' then gameY := StrToInt(value)
     else if key = '--game-width' then gameWidth := StrToInt(value)
     else if key = '--game-height' then gameHeight := StrToInt(value)
-    else if key = '--timer' then Timer.Interval := StrToInt(value);
+    else if key = '--timer' then Timer.Interval := StrToInt(value)
+    else if key = '--always-visible' then alwaysVisible := StrToBool(value);
   end;
 
   if gameWidth = 0 then gameWidth := Width;
