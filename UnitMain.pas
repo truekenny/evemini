@@ -18,7 +18,7 @@ type
     procedure FormDblClick(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-
+   procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -50,7 +50,6 @@ implementation
 function TFormMain.getHandle(): Cardinal;
 begin
   Result := FindWindow(nil, PChar(windowName));
-  // Result := FindWindow(nil, 'Calculator');
 end;
 
 procedure TFormMain.TimerTimer(Sender: TObject);
@@ -154,15 +153,6 @@ begin
    end;
 end;
 
-procedure TFormMain.FormActivate(Sender: TObject);
-begin
-  SetWindowLong(Handle, GWL_EXSTYLE,
-                GetWindowLong(Handle, GWL_EXSTYLE) or
-                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
-
-  ShowWindow(Application.Handle, SW_HIDE);
-end;
-
 procedure TFormMain.FormCreate(Sender: TObject);
 var
   index: Integer;
@@ -199,6 +189,12 @@ begin
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
 
+  // TODO 1 -cImportant: delete
+  if True then begin
+    windowName := 'Calculator';
+    readyToWork := true;
+  end;
+
   Caption := 'Evemini - ' + windowName;
 end;
 
@@ -233,6 +229,48 @@ begin
   Top := Top + delta;
   Width:= Width - delta * 2;
   Height := Height - delta * 2;
+end;
+
+procedure TFormMain.WMNCHitTest(var Message: TWMNCHitTest);
+const
+  EDGEDETECT = 7; // adjust
+var
+  deltaRect: TRect;
+begin
+  inherited;
+  if BorderStyle = bsNone then
+    with Message, deltaRect do
+    begin
+      Left := XPos - BoundsRect.Left;
+      Right := BoundsRect.Right - XPos;
+      Top := YPos - BoundsRect.Top;
+      Bottom := BoundsRect.Bottom - YPos;
+      if (Top < EDGEDETECT) and (Left < EDGEDETECT) then
+        Result := HTTOPLEFT
+      else if (Top < EDGEDETECT) and (Right < EDGEDETECT) then
+        Result := HTTOPRIGHT
+      else if (Bottom < EDGEDETECT) and (Left < EDGEDETECT) then
+        Result := HTBOTTOMLEFT
+      else if (Bottom < EDGEDETECT) and (Right < EDGEDETECT) then
+        Result := HTBOTTOMRIGHT
+      else if (Top < EDGEDETECT) then
+        Result := HTTOP
+      else if (Left < EDGEDETECT) then
+        Result := HTLEFT
+      else if (Bottom < EDGEDETECT) then
+        Result := HTBOTTOM
+      else if (Right < EDGEDETECT) then
+        Result := HTRIGHT
+    end;
+end;
+
+procedure TFormMain.FormActivate(Sender: TObject);
+begin
+  SetWindowLong(Handle, GWL_EXSTYLE,
+                GetWindowLong(Handle, GWL_EXSTYLE) or
+                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
+
+  ShowWindow(Application.Handle, SW_HIDE);
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);
