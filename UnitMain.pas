@@ -16,6 +16,8 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDblClick(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 
   private
     { Private declarations }
@@ -216,6 +218,21 @@ begin
     SetForegroundWindow(getHandle);
   end
   else if Button = mbMiddle then Close();
+end;
+
+procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var
+  delta: Integer;
+begin
+  // - scroll down
+  // + scroll up
+  delta := Round(WheelDelta / 10);
+
+  Left := Left + delta;
+  Top := Top + delta;
+  Width:= Width - delta * 2;
+  Height := Height - delta * 2;
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);

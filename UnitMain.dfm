@@ -18,6 +18,7 @@ object FormMain: TFormMain
   OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnMouseDown = FormMouseDown
+  OnMouseWheel = FormMouseWheel
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
