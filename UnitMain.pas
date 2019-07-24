@@ -152,6 +152,10 @@ end;
 
 procedure TFormMain.FormActivate(Sender: TObject);
 begin
+  SetWindowLong(Handle, GWL_EXSTYLE,
+                GetWindowLong(Handle, GWL_EXSTYLE) or
+                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
+
   ShowWindow(Application.Handle, SW_HIDE);
 end;
 
@@ -208,6 +212,10 @@ end;
 
 procedure TFormMain.FormShow(Sender: TObject);
 begin
+  SetWindowLong(Handle, GWL_EXSTYLE,
+                GetWindowLong(Handle, GWL_EXSTYLE) or
+                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
+
   ShowWindow(Application.Handle, SW_HIDE);
 end;
 
