@@ -25,8 +25,6 @@ type
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
-
-    function enumListOfTasks(hWindow: hWnd): Bool;  export;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
   private
@@ -223,6 +221,42 @@ begin
   ShowMessage(IntToStr((Sender as TMenuItem).Tag));
 end;
 
+function EnumWindowsProc(hWindow: HWND): Bool; stdcall;
+var
+  HoldString: PChar;
+  WindowStyle: Longint;
+  IsAChild: Word;
+  HoldhWnd: THoldhWnd;
+
+  menuItem : TMenuItem;
+begin
+  GetMem(HoldString, 256);
+
+  HoldhWnd := THoldhWnd.Create;
+  HoldhWnd.hWindow := hWindow;
+
+  WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
+  WindowStyle := WindowStyle and Longint(WS_VISIBLE);
+  IsAChild := GetWindowWord(hWindow, GWL_HWNDPARENT);
+
+  if (GetWindowText(hWindow, HoldString, 255) > 0)
+    and (WindowStyle > 0)
+    and (IsAChild = Word(nil))
+    then begin
+        // ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
+
+        menuItem := TMenuItem.Create(FormMain.menuSelectWindow);
+        menuItem.Caption := StrPas(HoldString);
+        menuItem.OnClick :=  FormMain.menuDefaultClick;
+        menuItem.Tag := hWindow;
+        FormMain.menuSelectWindow.Add(menuItem);
+    end;
+
+  FreeMem(HoldString, 256);
+  HoldhWnd := nil;
+  Result := True;
+end;
+
 procedure TFormMain.PopupActionBarPopup(Sender: TObject);
 var
   index : Integer;
@@ -248,43 +282,7 @@ begin
   menuSelectWindow.Add(menuItem);
 
 
-  enumWindows(@TFormMain.EnumListOfTasks, LPARAM(Self));
-end;
-
-function TFormMain.enumListOfTasks(hWindow: hWnd): Bool;
-var
-  HoldString: PChar;
-  WindowStyle: Longint;
-  IsAChild: Word;
-  HoldhWnd: THoldhWnd;
-
-  menuItem : TMenuItem;
-begin
-  GetMem(HoldString, 256);
-
-  HoldhWnd := THoldhWnd.Create;
-  HoldhWnd.hWindow := hWindow;
-
-  WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
-  WindowStyle := WindowStyle and Longint(WS_VISIBLE);
-  IsAChild := GetWindowWord(hWindow, GWL_HWNDPARENT);
-
-  if (GetWindowText(hWindow, HoldString, 255) > 0)
-    and (WindowStyle > 0)
-    and (IsAChild = Word(nil))
-    then begin
-        ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
-
-        //menuItem := TMenuItem.Create(_menuSelectWindow);
-        //menuItem.Caption := StrPas(HoldString);
-        //menuItem.OnClick := menuDefaultClick;
-        //menuItem.Tag := hWindow;
-        //_menuSelectWindow.Add(menuItem);
-    end;
-
-  FreeMem(HoldString, 256);
-  HoldhWnd := nil;
-  Result := True;
+  EnumWindows(@EnumWindowsProc,0);
 end;
 
 procedure TFormMain.FormDblClick(Sender: TObject);
