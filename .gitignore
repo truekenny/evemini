@@ -6,3 +6,5 @@
 run.bat
 Evemini.stat
 Win32/Debug/*.ini
+Win32/Release/*.ini
+evemini.zip
