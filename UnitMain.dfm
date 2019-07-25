@@ -24,6 +24,7 @@ object FormMain: TFormMain
   PixelsPerInch = 96
   TextHeight = 13
   object Timer: TTimer
+    Enabled = False
     Interval = 50
     OnTimer = TimerTimer
     Left = 8
@@ -46,6 +47,17 @@ object FormMain: TFormMain
       object N21: TMenuItem
         Caption = '2'
       end
+    end
+    object menuAlwaysVisible: TMenuItem
+      Caption = 'Always Visible'
+      OnClick = menuAlwaysVisibleClick
+    end
+    object menuSeparator: TMenuItem
+      Caption = '-'
+    end
+    object menuQuit: TMenuItem
+      Caption = 'Quit'
+      OnClick = menuQuitClick
     end
   end
 end

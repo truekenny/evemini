@@ -15,6 +15,9 @@ type
     menuDefault: TMenuItem;
     N11: TMenuItem;
     N21: TMenuItem;
+    menuAlwaysVisible: TMenuItem;
+    menuSeparator: TMenuItem;
+    menuQuit: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -27,6 +30,8 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
+    procedure menuAlwaysVisibleClick(Sender: TObject);
+    procedure menuQuitClick(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -53,9 +58,8 @@ var
   gameWidth: Integer = 0;
   gameHeight: Integer = 0;
   gameHandle: Cardinal = 0;
-  alwaysVisible: Boolean = False;
+
   PH: HTHUMBNAIL;
-  readyToWork: Boolean = False;
 
 implementation
 
@@ -89,7 +93,7 @@ procedure TFormMain.fresh;
 var
   _handle: Cardinal;
 begin
-  if not readyToWork then Exit;
+  if not Timer.Enabled then Exit;
 
   if (gameHandle <> 0) and IsWindow(gameHandle) then begin
     // already active
@@ -102,7 +106,7 @@ begin
 
     if _handle = 0 then begin
       // cant activate
-      if not alwaysVisible then Visible := false;
+      if not menuAlwaysVisible.Checked then Visible := false;
       Color := clBtnFace;
 
     end else begin
@@ -189,7 +193,7 @@ begin
 
     if key = '--name' then begin
       windowName := 'EVE - ' + value;
-      readyToWork := True;
+      Timer.Enabled := True;
     end
     else if key = '--form-x' then Left := StrToInt(value)
     else if key = '--form-y' then Top := StrToInt(value)
@@ -200,7 +204,7 @@ begin
     else if key = '--game-width' then gameWidth := StrToInt(value)
     else if key = '--game-height' then gameHeight := StrToInt(value)
     else if key = '--timer' then Timer.Interval := StrToInt(value)
-    else if key = '--always-visible' then alwaysVisible := StrToBool(value);
+    else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
   end;
 
   if gameWidth = 0 then gameWidth := Width;
@@ -209,7 +213,7 @@ begin
   // TODO: Delete
   if True then begin
     windowName := 'Calculator';
-    readyToWork := true;
+    Timer.Enabled := true;
   end;
 
   if windowName = '' then
@@ -218,12 +222,24 @@ begin
     Caption := 'Evemini - ' + windowName;
 end;
 
+procedure TFormMain.menuAlwaysVisibleClick(Sender: TObject);
+begin
+    menuAlwaysVisible.Checked := not menuAlwaysVisible.Checked;
+end;
+
 procedure TFormMain.menuDefaultClick(Sender: TObject);
 begin
   DwmUnregisterThumbnail(PH);
-  gameHandle := 0;
+  gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
-  readyToWork := true;
+  Timer.Enabled := true;
+
+  registerThumbnail;
+end;
+
+procedure TFormMain.menuQuitClick(Sender: TObject);
+begin
+  Close();
 end;
 
 // Global
