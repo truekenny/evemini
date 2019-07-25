@@ -39,6 +39,7 @@ object FormMain: TFormMain
       object menuDefault: TMenuItem
         Caption = 'None'
         Enabled = False
+        Visible = False
         OnClick = menuDefaultClick
       end
       object N11: TMenuItem
@@ -48,11 +49,28 @@ object FormMain: TFormMain
         Caption = '2'
       end
     end
+    object menuSelectGameArea: TMenuItem
+      Caption = 'Select Game Area'
+      OnClick = menuSelectGameAreaClick
+    end
+    object menuSeparatorChecks: TMenuItem
+      Caption = '-'
+    end
     object menuAlwaysVisible: TMenuItem
       Caption = 'Always Visible'
-      OnClick = menuAlwaysVisibleClick
+      OnClick = menuReCheck
     end
-    object menuSeparator: TMenuItem
+    object menuWindowMovable: TMenuItem
+      Caption = 'Window Movable'
+      Checked = True
+      OnClick = menuReCheck
+    end
+    object menuWindowSizable: TMenuItem
+      Caption = 'Window Sizable'
+      Checked = True
+      OnClick = menuReCheck
+    end
+    object menuSeparatorQuit: TMenuItem
       Caption = '-'
     end
     object menuQuit: TMenuItem

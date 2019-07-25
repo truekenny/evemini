@@ -16,8 +16,12 @@ type
     N11: TMenuItem;
     N21: TMenuItem;
     menuAlwaysVisible: TMenuItem;
-    menuSeparator: TMenuItem;
+    menuSeparatorChecks: TMenuItem;
     menuQuit: TMenuItem;
+    menuSelectGameArea: TMenuItem;
+    menuSeparatorQuit: TMenuItem;
+    menuWindowMovable: TMenuItem;
+    menuWindowSizable: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -30,8 +34,9 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
-    procedure menuAlwaysVisibleClick(Sender: TObject);
+    procedure menuReCheck(Sender: TObject);
     procedure menuQuitClick(Sender: TObject);
+    procedure menuSelectGameAreaClick(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -133,7 +138,7 @@ begin
            Props.dwFlags:=DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
                           DWM_TNP_OPACITY;
 
-           Props.fSourceClientAreaOnly := true;
+           Props.fSourceClientAreaOnly := false;
            Props.fVisible := true;
            Props.opacity := 255;
 
@@ -157,21 +162,22 @@ var
   Props: DWM_THUMBNAIL_PROPERTIES;
   borderWidth: Integer;
 begin
-   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
+  Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
   if withBorder and (WindowState <> wsMaximized)
   then borderWidth := 3
   else borderWidth := 0;
 
-   Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
-   Props.rcSource := Rect(
+  Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
+  Props.rcSource := Rect(
     Point(gameX + borderWidth ,gameY + borderWidth),
     Point(gameX + gameWidth - borderWidth, gameY + gameHeight - borderWidth)
-    );
-   if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
-      ShowMessage('Properties (border) fail');
-      Close();
-   end;
+  );
+
+  if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
+    ShowMessage('Properties (border) fail');
+    Close();
+  end;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
@@ -204,6 +210,8 @@ begin
     else if key = '--game-width' then gameWidth := StrToInt(value)
     else if key = '--game-height' then gameHeight := StrToInt(value)
     else if key = '--timer' then Timer.Interval := StrToInt(value)
+    else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
+    else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
   end;
 
@@ -222,9 +230,9 @@ begin
     Caption := 'Evemini - ' + windowName;
 end;
 
-procedure TFormMain.menuAlwaysVisibleClick(Sender: TObject);
+procedure TFormMain.menuReCheck(Sender: TObject);
 begin
-    menuAlwaysVisible.Checked := not menuAlwaysVisible.Checked;
+    (Sender as TMenuItem).Checked := not (Sender as TMenuItem).Checked;
 end;
 
 procedure TFormMain.menuDefaultClick(Sender: TObject);
@@ -240,6 +248,20 @@ end;
 procedure TFormMain.menuQuitClick(Sender: TObject);
 begin
   Close();
+end;
+
+procedure TFormMain.menuSelectGameAreaClick(Sender: TObject);
+var
+  rect: TRect;
+begin
+//
+  GetWindowRect(gameHandle, rect);
+
+  gameX := Left - rect.Left;
+  gameY := Top - rect.Top;
+
+  gameWidth := Width;
+  gameHeight := Height;
 end;
 
 // Global
