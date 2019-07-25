@@ -32,9 +32,10 @@ object FormMain: TFormMain
     Top = 8
   end
   object PopupActionBar: TPopupActionBar
+    Images = imageList
     OnPopup = PopupActionBarPopup
-    Left = 88
-    Top = 24
+    Left = 56
+    Top = 8
     object menuSelectWindow: TMenuItem
       Caption = 'Select Window'
       object menuDefault: TMenuItem
@@ -86,5 +87,9 @@ object FormMain: TFormMain
       Caption = 'Quit'
       OnClick = menuQuitClick
     end
+  end
+  object imageList: TImageList
+    Left = 104
+    Top = 8
   end
 end

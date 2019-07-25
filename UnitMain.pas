@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
-  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup;
+  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
+  Vcl.ImgList;
 
 type
   TFormMain = class(TForm)
@@ -24,6 +25,7 @@ type
     menuWindowSizable: TMenuItem;
     menuResizeWindow1x1: TMenuItem;
     menuWindowHalfOpacity: TMenuItem;
+    imageList: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -289,6 +291,10 @@ var
   HoldhWnd: THoldhWnd;
 
   menuItem : TMenuItem;
+
+  HIco: HICON;
+  Icon: TIcon;
+  iconCount: Integer;
 begin
   GetMem(HoldString, 256);
 
@@ -309,6 +315,25 @@ begin
         menuItem.Caption := StrPas(HoldString);
         menuItem.OnClick :=  FormMain.menuDefaultClick;
         menuItem.Tag := hWindow;
+
+
+        iconCount := Formmain.imageList.Count;
+        HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
+        if HIco = 0 then
+          HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
+        Icon := TIcon.Create;
+        try
+          Icon.ReleaseHandle;
+          Icon.Handle := HIco;
+          Formmain.imageList.AddIcon(Icon);
+        finally
+          Icon.Free;
+        end;
+
+
+        if iconCount <> Formmain.imageList.Count then
+          menuItem.ImageIndex := Formmain.imageList.Count - 1;
+
         FormMain.menuSelectWindow.Add(menuItem);
     end;
 
@@ -326,6 +351,7 @@ begin
     menuSelectWindow.Delete(1);
   end;
 
+  imageList.Clear;
   EnumWindows(@EnumWindowsProc, 0);
 end;
 
