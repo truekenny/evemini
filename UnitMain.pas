@@ -22,6 +22,8 @@ type
     menuSeparatorQuit: TMenuItem;
     menuWindowMovable: TMenuItem;
     menuWindowSizable: TMenuItem;
+    menuResizeWindow1x1: TMenuItem;
+    menuWindowHalfOpacity: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -37,6 +39,8 @@ type
     procedure menuReCheck(Sender: TObject);
     procedure menuQuitClick(Sender: TObject);
     procedure menuSelectGameAreaClick(Sender: TObject);
+    procedure menuResizeWindow1x1Click(Sender: TObject);
+    procedure menuWindowHalfOpacityClick(Sender: TObject);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -235,6 +239,12 @@ begin
     (Sender as TMenuItem).Checked := not (Sender as TMenuItem).Checked;
 end;
 
+procedure TFormMain.menuResizeWindow1x1Click(Sender: TObject);
+begin
+  Width := gameWidth;
+  Height := gameHeight;
+end;
+
 procedure TFormMain.menuDefaultClick(Sender: TObject);
 begin
   DwmUnregisterThumbnail(PH);
@@ -262,6 +272,12 @@ begin
 
   gameWidth := Width;
   gameHeight := Height;
+end;
+
+procedure TFormMain.menuWindowHalfOpacityClick(Sender: TObject);
+begin
+  menuWindowHalfOpacity.Checked := not menuWindowHalfOpacity.Checked;
+  AlphaBlend :=  menuWindowHalfOpacity.Checked;
 end;
 
 // Global
@@ -339,17 +355,19 @@ end;
 
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+const
+  DELTA = 0.05;
 var
-  delta: Integer;
+  direction: Integer;
 begin
   // - scroll down
   // + scroll up
-  delta := Round(WheelDelta / 10);
+  direction := Round(WheelDelta / Abs(WheelDelta));
 
-  Left := Left + delta;
-  Top := Top + delta;
-  Width:= Width - delta * 2;
-  Height := Height - delta * 2;
+  Left := Left + Round(direction * Width * DELTA);
+  Top := Top + Round(direction * Height * DELTA);
+  Width:= Width - Round(direction * 2 * Width * DELTA);
+  Height := Height - Round(direction * 2 * Height * DELTA);
 end;
 
 // Resize bsNone

@@ -1,6 +1,7 @@
 object FormMain: TFormMain
   Left = 0
   Top = 0
+  AlphaBlendValue = 170
   BorderStyle = bsNone
   Caption = 'FormMain'
   ClientHeight = 178
@@ -53,6 +54,10 @@ object FormMain: TFormMain
       Caption = 'Select Game Area'
       OnClick = menuSelectGameAreaClick
     end
+    object menuResizeWindow1x1: TMenuItem
+      Caption = 'Resize Window 1x1'
+      OnClick = menuResizeWindow1x1Click
+    end
     object menuSeparatorChecks: TMenuItem
       Caption = '-'
     end
@@ -69,6 +74,10 @@ object FormMain: TFormMain
       Caption = 'Window Sizable'
       Checked = True
       OnClick = menuReCheck
+    end
+    object menuWindowHalfOpacity: TMenuItem
+      Caption = 'Window Half Opacity'
+      OnClick = menuWindowHalfOpacityClick
     end
     object menuSeparatorQuit: TMenuItem
       Caption = '-'
