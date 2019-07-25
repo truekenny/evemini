@@ -334,7 +334,6 @@ procedure TFormMain.menuSelectGameAreaClick(Sender: TObject);
 var
   rect: TRect;
 begin
-//
   GetWindowRect(gameHandle, rect);
 
   gameX := Left - rect.Left;
@@ -347,7 +346,7 @@ end;
 procedure TFormMain.menuWindowHalfOpacityClick(Sender: TObject);
 begin
   menuWindowHalfOpacity.Checked := not menuWindowHalfOpacity.Checked;
-  AlphaBlend :=  menuWindowHalfOpacity.Checked;
+  AlphaBlend := menuWindowHalfOpacity.Checked;
 end;
 
 // Global
@@ -431,7 +430,7 @@ procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   // Move form
-  if Button = mbLeft then begin
+  if (Button = mbLeft) and (menuWindowMovable.Checked) then begin
     ReleaseCapture;
     SendMessage(Handle, WM_SYSCOMMAND, 61458, 0) ;
   end;
@@ -449,6 +448,8 @@ const
 var
   direction: Integer;
 begin
+  if not menuWindowSizable.Checked then Exit;
+
   // - scroll down
   // + scroll up
   direction := Round(WheelDelta / Abs(WheelDelta));
@@ -467,6 +468,9 @@ var
   deltaRect: TRect;
 begin
   inherited;
+
+  if not menuWindowSizable.Checked then Exit;
+
   if BorderStyle = bsNone then
     with Message, deltaRect do
     begin
@@ -495,19 +499,24 @@ end;
 
 procedure TFormMain.FormActivate(Sender: TObject);
 begin
+  // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,
                 GetWindowLong(Handle, GWL_EXSTYLE) or
                 WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
 
+
+  // - TaskBar
   ShowWindow(Application.Handle, SW_HIDE);
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);
 begin
+  // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,
                 GetWindowLong(Handle, GWL_EXSTYLE) or
                 WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
 
+  // - TaskBar
   ShowWindow(Application.Handle, SW_HIDE);
 end;
 
