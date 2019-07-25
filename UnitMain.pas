@@ -444,7 +444,7 @@ begin
   if Button = mbLeft then begin
     // Form do not change position
     if(_formPosition = Point(Left, Top)) then begin
-      SetForegroundWindow(gameHeight);
+      SetForegroundWindow(gameHandle);
     end;
   end
   else if Button = mbMiddle then Close();
