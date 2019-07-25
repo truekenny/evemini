@@ -26,19 +26,22 @@ Evemini - приложение, дублирующие содержимого о
 #### Последующие запуски без повторной настройки
 
 1. После первого закрытия приложения в папке с ним появится файл с сохраненной конфигурацией с именем вида (Firefox - Twitch.ini);
-2. Если gragNdrop этот файл на exe-файл приложения, то приложение запустится с этой конфигурацией;
+2. Если скинуть этот файл на exe приложения, то приложение запустится с этой конфигурацией;
 3. Можно создать ярлык на приложение с параметром равным имени этого файла конфигурации, то есть `evemini "Firefox - Twitch.ini"`, с полным или относительным путём к файлу (если в имени файла или пути к нему есть пробелы, то кавычки обязательны).
 
 - Другой вариант, это переместить всю конфигурацию в параметры приложения, например:
 
+```
+evemini --capsuleer-name="Gamer Name" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+```
 
-    evemini --capsuleer-name="Gamer Name" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+- Запуск нескольких копий из batch файла, например, создаём файл `go.bat` со следующим содержимым:
 
-- Запуск нескольких копий из batch файла, например, создаём файл go.bat со следующим содержимым:
-
-
-    start /LOW evemini --capsuleer-name="Gamer First" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
-    start /LOW evemini --capsuleer-name="Gamer Second" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+```
+start /LOW evemini --capsuleer-name="Gamer First" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+start /LOW evemini --capsuleer-name="Gamer Second" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+rem Сколько угодно сразу
+```
 
 #### Параметры коммандной строки
 
