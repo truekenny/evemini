@@ -431,15 +431,21 @@ end;
 
 procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+var
+  _formPosition: TPoint;
 begin
+  _formPosition := Point(Left, Top);
   // Move form
   if (Button = mbLeft) and (menuWindowMovable.Checked) then begin
     ReleaseCapture;
-    SendMessage(Handle, WM_SYSCOMMAND, 61458, 0) ;
+    SendMessage(Handle, WM_SYSCOMMAND, 61458, 0);
   end;
 
   if Button = mbLeft then begin
-    SetForegroundWindow(getHandle);
+    // Form do not change position
+    if(_formPosition = Point(Left, Top)) then begin
+      SetForegroundWindow(gameHeight);
+    end;
   end
   else if Button = mbMiddle then Close();
 end;
