@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles;
+  Vcl.ImgList, IniFiles, RegularExpressions;
 
 type
   TFormMain = class(TForm)
@@ -188,10 +188,18 @@ procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
   config: String;
-begin
-  if windowName = '' then Exit;
 
-  config := ExtractFilePath(ParamStr(0)) + windowName + '.ini';
+  RegEx: TRegEx;
+begin
+  config := windowName;
+  // config := '123-123 - /?\:Test - Òåñò-ßÿ¨¸Éé';
+  RegEx.Create('[^0-9a-zA-Zà-ÿÀ-ß\-\ ¸¨]');
+  config := RegEx.Replace(config, '');
+  config := Trim(config);
+
+  if config = '' then Exit;
+
+  config := ExtractFilePath(ParamStr(0)) + config + '.ini';
 
   ini := TIniFile.Create(config);
   try
