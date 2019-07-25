@@ -413,7 +413,10 @@ begin
     menuSelectWindow.Delete(1);
   end;
 
-  imageList.Clear;
+  //imageList.Clear;
+  for index := 3 to imageList.Count - 1 do
+    imageList.Delete(3);
+
   EnumWindows(@EnumWindowsProc, 0);
 end;
 
