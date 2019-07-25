@@ -145,14 +145,16 @@ begin
            if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
              Color := clLime;
            end else begin
+              Timer.Enabled := False;
               ShowMessage('Properties fail');
-              Close();
+              Close;
            end;
          end
       else
         begin
+          Timer.Enabled := False;
           ShowMessage('General fail');
-          Close();
+          Close;
         end;
     end;
 end;
@@ -175,8 +177,9 @@ begin
   );
 
   if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
+    Timer.Enabled := False;
     ShowMessage('Properties (border) fail');
-    Close();
+    Close;
   end;
 end;
 
