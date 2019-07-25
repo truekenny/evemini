@@ -55,12 +55,6 @@ type
     { Public declarations }
   end;
 
-  THoldhWnd = class(TObject)
-  private
-  public
-    hWindow: hWnd;
-  end;
-
 var
   FormMain: TFormMain;
   windowName: string;
@@ -288,7 +282,6 @@ var
   HoldString: PChar;
   WindowStyle: Longint;
   IsAChild: Word;
-  HoldhWnd: THoldhWnd;
 
   menuItem : TMenuItem;
 
@@ -297,9 +290,6 @@ var
   iconCount: Integer;
 begin
   GetMem(HoldString, 256);
-
-  HoldhWnd := THoldhWnd.Create;
-  HoldhWnd.hWindow := hWindow;
 
   WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
   WindowStyle := WindowStyle and Longint(WS_VISIBLE);
@@ -338,7 +328,6 @@ begin
     end;
 
   FreeMem(HoldString, 256);
-  HoldhWnd := nil;
   Result := True;
 end;
 

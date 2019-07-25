@@ -89,6 +89,7 @@ object FormMain: TFormMain
     end
   end
   object imageList: TImageList
+    ColorDepth = cd32Bit
     Left = 104
     Top = 8
   end
