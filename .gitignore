@@ -5,3 +5,4 @@
 *.exe
 run.bat
 Evemini.stat
+Win32/Debug/*.ini

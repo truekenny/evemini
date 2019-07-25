@@ -15,8 +15,8 @@ object FormMain: TFormMain
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   PopupMenu = PopupActionBar
-  Position = poDesktopCenter
   OnActivate = FormActivate
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnMouseDown = FormMouseDown

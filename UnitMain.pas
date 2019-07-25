@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList;
+  Vcl.ImgList, IniFiles;
 
 type
   TFormMain = class(TForm)
@@ -43,6 +43,7 @@ type
     procedure menuSelectGameAreaClick(Sender: TObject);
     procedure menuResizeWindow1x1Click(Sender: TObject);
     procedure menuWindowHalfOpacityClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     procedure explode(var a: array of string; Border, S: string);
@@ -183,36 +184,104 @@ begin
   end;
 end;
 
+procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  ini: TIniFile;
+  config: String;
+begin
+  if windowName = '' then Exit;
+
+  config := ExtractFilePath(ParamStr(0)) + windowName + '.ini';
+
+  ini := TIniFile.Create(config);
+  try
+    ini.WriteString('game', 'name', windowName);
+    ini.WriteInteger('game', 'left', gameX);
+    ini.WriteInteger('game', 'top', gameY);
+    ini.WriteInteger('game', 'width', gameWidth);
+    ini.WriteInteger('game', 'height', gameHeight);
+
+    ini.WriteInteger('form', 'left', Left);
+    ini.WriteInteger('form', 'top', Top);
+    ini.WriteInteger('form', 'width', Width);
+    ini.WriteInteger('form', 'height', Height);
+
+    ini.WriteBool('check', 'window-movable', menuWindowMovable.Checked);
+    ini.WriteBool('check', 'window-sizable', menuWindowSizable.Checked);
+    ini.WriteBool('check', 'always-visible', menuAlwaysVisible.Checked);
+  finally
+    ini.Free;
+  end;
+end;
+
 procedure TFormMain.FormCreate(Sender: TObject);
 var
   index: Integer;
   param, key, value: string;
   pair: array of string;
+
+  ini: TIniFile;
 begin
   SetLength(pair, 2);
 
   for index := 1 to ParamCount do begin
     param := ParamStr(index);
+
+    if FileExists(param) then begin
+      ini := TIniFile.Create(param);
+      try
+        windowName := ini.ReadString('game', 'name', windowName);
+        Timer.Enabled := True;
+
+        gameX := ini.ReadInteger('game', 'left', gameX);
+        gameY := ini.ReadInteger('game', 'top', gameY);
+        gameWidth := ini.ReadInteger('game', 'width', gameWidth);
+        gameHeight := ini.ReadInteger('game', 'height', gameHeight);
+
+        Left := ini.ReadInteger('form', 'left', Left);
+        Top := ini.ReadInteger('form', 'top', Top);
+        Width := ini.ReadInteger('form', 'width', Width);
+        Height := ini.ReadInteger('form', 'height', Height);
+
+        menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
+        menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
+        menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
+      finally
+        ini.Free;
+      end;
+
+      continue;
+    end;
+
+
     explode(pair, '=', param);
 
     key := pair[0];
     value := pair[1];
 
+
     // --name="Elle Tan" --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=10 --game-y=10 --always-visible=true
 
-    if key = '--name' then begin
+    if key = '--capsuleer-name' then begin
       windowName := 'EVE - ' + value;
       Timer.Enabled := True;
     end
-    else if key = '--form-x' then Left := StrToInt(value)
-    else if key = '--form-y' then Top := StrToInt(value)
+    else if key = '--window-name' then begin
+      windowName := value;
+      Timer.Enabled := True;
+    end
+    else if key = '--form-left' then Left := StrToInt(value)
+    else if key = '--form-top' then Top := StrToInt(value)
     else if key = '--form-width' then Width := StrToInt(value)
     else if key = '--form-height' then Height := StrToInt(value)
-    else if key = '--game-x' then gameX := StrToInt(value)
-    else if key = '--game-y' then gameY := StrToInt(value)
+
+    else if key = '--game-left' then gameX := StrToInt(value)
+    else if key = '--game-top' then gameY := StrToInt(value)
     else if key = '--game-width' then gameWidth := StrToInt(value)
     else if key = '--game-height' then gameHeight := StrToInt(value)
+
     else if key = '--timer' then Timer.Interval := StrToInt(value)
+
     else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
@@ -220,12 +289,6 @@ begin
 
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
-
-  // TODO: Delete
-  if True then begin
-    windowName := 'Calculator';
-    Timer.Enabled := true;
-  end;
 
   if windowName = '' then
     Caption := 'Evemini'
