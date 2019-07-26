@@ -2,7 +2,8 @@ program Evemini;
 
 uses
   Vcl.Forms,
-  UnitMain in 'UnitMain.pas' {FormMain};
+  UnitMain in 'UnitMain.pas' {FormMain},
+  UnitProcessLibrary in 'UnitProcessLibrary.pas';
 
 {$R *.res}
 

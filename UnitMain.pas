@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles, RegularExpressions;
+  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary;
 
 type
   TFormMain = class(TForm)
@@ -361,7 +361,12 @@ var
   HIco: HICON;
   Icon: TIcon;
   iconCount: Integer;
+
+  pid: Cardinal;
+  filename: string;
+  indexIcon: Word;
 begin
+  indexIcon := 0;
   GetMem(HoldString, 256);
 
   WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
@@ -381,9 +386,24 @@ begin
 
 
         iconCount := Formmain.imageList.Count;
+        // Big icon from window
         HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
+
+        // Small icon from window
         if HIco = 0 then
           HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
+
+        // Icon from exe-file
+        if HIco = 0 then begin
+          pid := GetPIDByHWnd(hWindow);
+          if pid <> 0 then begin
+            filename := GetPathFromPID(pid);
+            if filename <> '' then begin
+              HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename), indexIcon);
+            end;
+          end;
+        end;
+
         Icon := TIcon.Create;
         try
           Icon.ReleaseHandle;
