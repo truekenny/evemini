@@ -51,6 +51,7 @@ type
     procedure fresh();
     procedure registerThumbnail();
     procedure borderThumbnail(withBorder: Boolean);
+    procedure generateConfigFilename();
 
   public
     { Public declarations }
@@ -64,12 +65,28 @@ var
   gameWidth: Integer = 0;
   gameHeight: Integer = 0;
   gameHandle: Cardinal = 0;
+  config: string;
 
   PH: HTHUMBNAIL;
 
 implementation
 
 {$R *.dfm}
+
+procedure TFormMain.generateConfigFilename();
+var
+  RegEx: TRegEx;
+begin
+  config := windowName;
+  // config := '123-123 - /?\:Test - Òåñò-ßÿ¨¸Éé';
+  RegEx.Create('[^0-9a-zA-Zà-ÿÀ-ß\-\ ¸¨]');
+  config := RegEx.Replace(config, '');
+  config := Trim(config);
+
+  if config = '' then Exit;
+
+  config := ExtractFilePath(ParamStr(0)) + config + '.ini';
+end;
 
 function TFormMain.getHandle(): Cardinal;
 begin
@@ -187,19 +204,8 @@ end;
 procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
-  config: String;
-
-  RegEx: TRegEx;
 begin
-  config := windowName;
-  // config := '123-123 - /?\:Test - Òåñò-ßÿ¨¸Éé';
-  RegEx.Create('[^0-9a-zA-Zà-ÿÀ-ß\-\ ¸¨]');
-  config := RegEx.Replace(config, '');
-  config := Trim(config);
-
   if config = '' then Exit;
-
-  config := ExtractFilePath(ParamStr(0)) + config + '.ini';
 
   ini := TIniFile.Create(config);
   try
@@ -236,6 +242,8 @@ begin
     param := ParamStr(index);
 
     if FileExists(param) then begin
+      config := param;
+
       ini := TIniFile.Create(param);
       try
         windowName := ini.ReadString('game', 'name', windowName);
@@ -273,10 +281,12 @@ begin
     if key = '--capsuleer-name' then begin
       windowName := 'EVE - ' + value;
       Timer.Enabled := True;
+      generateConfigFilename;
     end
     else if key = '--window-name' then begin
       windowName := value;
       Timer.Enabled := True;
+      generateConfigFilename;
     end
     else if key = '--form-left' then Left := StrToInt(value)
     else if key = '--form-top' then Top := StrToInt(value)
@@ -322,6 +332,7 @@ begin
   windowName := (Sender as TMenuItem).Caption;
   Timer.Enabled := true;
 
+  generateConfigFilename;
   registerThumbnail;
 end;
 
