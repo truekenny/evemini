@@ -52,6 +52,7 @@ type
     procedure registerThumbnail();
     procedure borderThumbnail(withBorder: Boolean);
     procedure generateConfigFilename();
+    function isWritable(filename: string): Boolean;
 
   public
     { Public declarations }
@@ -72,6 +73,16 @@ var
 implementation
 
 {$R *.dfm}
+
+function TFormMain.isWritable(filename: string): Boolean;
+var
+  H: THandle;
+begin
+  H := CreateFile(PChar(filename), GENERIC_READ or GENERIC_WRITE, 0, nil,
+    OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  Result := H <> INVALID_HANDLE_VALUE;
+  if Result then CloseHandle(H);
+end;
 
 procedure TFormMain.generateConfigFilename();
 var
@@ -206,6 +217,8 @@ var
   ini: TIniFile;
 begin
   if config = '' then Exit;
+
+  if not isWritable(config) then Exit;
 
   ini := TIniFile.Create(config);
   try
