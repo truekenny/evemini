@@ -2,11 +2,11 @@ program Evemini;
 
 uses
   Vcl.Forms,
-  UnitEveminiMain in 'UnitEveminiMain.pas' {FormEveminiMain},
+  UnitWindow in 'UnitWindow.pas' {FormWindow},
   UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
-  UnitProcessLibrary in 'UnitProcessLibrary.pas',
+  UnitGetBuild in 'UnitGetBuild.pas',
   UnitInlineMacros in 'UnitInlineMacros.pas',
-  UnitGetBuild in 'UnitGetBuild.pas';
+  UnitProcessLibrary in 'UnitProcessLibrary.pas';
 
 {$R *.res}
 
@@ -25,11 +25,11 @@ begin
   Application.ShowMainForm := false;
 
   // Default form
-  Application.CreateForm(TFormEveminiMain, FormEveminiMain);
+  Application.CreateForm(TFormEvemini, FormEvemini);
 
-  SetLength(FormEvemini, Length(FormEvemini) + 1);
-  Application.CreateForm(TFormEvemini, FormEvemini[Length(FormEvemini) - 1]);
-  FormEvemini[Length(FormEvemini) - 1].initialize(Length(FormEvemini) - 1, params);
+  SetLength(FormWindow, Length(FormWindow) + 1);
+  Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
+  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params);
 
   Application.Run;
 end.

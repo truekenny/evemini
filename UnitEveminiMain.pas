@@ -1,13 +1,13 @@
-unit UnitEveminiMain;
+unit UnitEvemini;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, UnitEvemini;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, UnitWindow;
 
 type
-  TFormEveminiMain = class(TForm)
+  TFormEvemini = class(TForm)
     TimerCheckForms: TTimer;
     procedure TimerCheckFormsTimer(Sender: TObject);
   private
@@ -17,18 +17,18 @@ type
   end;
 
 var
-  FormEveminiMain: TFormEveminiMain;
+  FormEvemini: TFormEvemini;
 
 implementation
 
 {$R *.dfm}
 
-procedure TFormEveminiMain.TimerCheckFormsTimer(Sender: TObject);
+procedure TFormEvemini.TimerCheckFormsTimer(Sender: TObject);
 var
   index: Integer;
 begin
-  for index := 0 to Length(FormEvemini) - 1 do begin
-    if FormEvemini[index] <> nil then Exit;
+  for index := 0 to Length(FormWindow) - 1 do begin
+    if FormWindow[index] <> nil then Exit;
   end;
 
   Close();
