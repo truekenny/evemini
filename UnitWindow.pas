@@ -19,7 +19,7 @@ type
     N21: TMenuItem;
     menuAlwaysVisible: TMenuItem;
     menuSeparatorChecks: TMenuItem;
-    menuQuit: TMenuItem;
+    menuClose: TMenuItem;
     menuSelectTargetRegion: TMenuItem;
     menuSeparatorQuit: TMenuItem;
     menuWindowMovable: TMenuItem;
@@ -45,7 +45,7 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
-    procedure menuQuitClick(Sender: TObject);
+    procedure menuCloseClick(Sender: TObject);
     procedure menuSelectTargetRegionClick(Sender: TObject);
     procedure menuResizeWindow1x1Click(Sender: TObject);
     procedure menuWindowHalfOpacityClick(Sender: TObject);
@@ -81,7 +81,7 @@ type
     procedure saveProportion();
   public
     { Public declarations }
-    procedure initialize(_windowIndex: Integer; params: array of string);
+    procedure initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
 end;
@@ -299,7 +299,7 @@ begin
 
 end;
 
-procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string);
+procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
 var
   index: Integer;
   param, key, value: string;
@@ -393,6 +393,10 @@ begin
     Caption := 'Evemini'
   else
     Caption := 'Evemini - ' + windowName;
+
+  if mutex <>0 then begin
+    ReleaseMutex(mutex);
+  end;
 end;
 
 procedure TFormWindow.menuResizeWindow1x1Click(Sender: TObject);
@@ -444,12 +448,12 @@ begin
 
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
-  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params);
+  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params, 0);
 
   params := nil;
 end;
 
-procedure TFormWindow.menuQuitClick(Sender: TObject);
+procedure TFormWindow.menuCloseClick(Sender: TObject);
 begin
   Close();
 end;

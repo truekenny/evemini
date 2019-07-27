@@ -146,9 +146,9 @@ object FormWindow: TFormWindow
     object menuSeparatorQuit: TMenuItem
       Caption = '-'
     end
-    object menuQuit: TMenuItem
-      Caption = 'Quit'
-      OnClick = menuQuitClick
+    object menuClose: TMenuItem
+      Caption = 'Close'
+      OnClick = menuCloseClick
     end
   end
   object imageList: TImageList
@@ -156,7 +156,7 @@ object FormWindow: TFormWindow
     Left = 88
     Top = 136
     Bitmap = {
-      494C0101050008006C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010105000800700010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

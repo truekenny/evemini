@@ -24,7 +24,12 @@ var
   sendParams: string;
   aCopyData: TCopyDataStruct;
 
+  mutex: Cardinal;
+
 begin
+  mutex := CreateMutex(nil, false, 'evemini');
+  WaitForSingleObject(mutex, 5000);
+
   SetLength(params, ParamCount);
   for index := 0 to ParamCount - 1 do begin
     params[index] := ParamStr(index + 1);
@@ -42,6 +47,9 @@ begin
        end;
 
     SendMessage(targetHwnd, WM_COPYDATA, Application.Handle, Longint(@aCopyData));
+
+
+    ReleaseMutex(mutex);
     exit;
   end;
 
@@ -55,7 +63,7 @@ begin
   // First Window
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
-  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params);
+  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params, mutex);
 
   params := nil;
 
