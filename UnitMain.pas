@@ -97,6 +97,7 @@ begin
   if not menuWindowProportion.Checked then Exit;
 
   Width := Round(Height * gameWidth / gameHeight);
+  borderThumbnail(gameHandle = GetForegroundWindow);
 end;
 
 // Save proportion on resize form
@@ -120,6 +121,8 @@ begin
         Top := Bottom - Round((Right-Left)/aspectRatio);
   end;
   inherited;
+
+  borderThumbnail(gameHandle = GetForegroundWindow);
 end;
 
 function TFormMain.isWritable(filename: string): Boolean;
@@ -243,6 +246,8 @@ var
   gameBorderWidth: Integer;
   gameBorderHeight: Integer;
 begin
+  if gameHandle = 0 then Exit;
+
   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
   if withBorder and (WindowState <> wsMaximized)
@@ -421,10 +426,10 @@ begin
   gameWidth := rect.Width;
   gameHeight := rect.Height;
 
-  saveProportion();
-
   generateConfigFilename;
   registerThumbnail;
+
+  saveProportion();
 end;
 
 procedure TFormMain.menuQuitClick(Sender: TObject);
