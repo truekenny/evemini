@@ -63,6 +63,10 @@ object FormMain: TFormMain
       ImageIndex = 2
       OnClick = menuResizeWindow1x1Click
     end
+    object menuAllTargetSpace: TMenuItem
+      Caption = 'All Target Space'
+      OnClick = menuAllTargetSpaceClick
+    end
     object menuSeparatorChecks: TMenuItem
       Caption = '-'
     end

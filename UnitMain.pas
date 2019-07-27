@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary;
+  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
+  Math;
 
 type
   TFormMain = class(TForm)
@@ -27,6 +28,7 @@ type
     menuWindowHalfOpacity: TMenuItem;
     imageList: TImageList;
     menuWindowProportion: TMenuItem;
+    menuAllTargetSpace: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -48,6 +50,7 @@ type
     procedure WMSizing(var Message: TMessage); message WM_SIZING;
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure menuAllTargetSpaceClick(Sender: TObject);
   private
     { Private declarations }
     windowName: string;
@@ -365,6 +368,17 @@ begin
   Height := gameHeight;
 end;
 
+procedure TFormMain.menuAllTargetSpaceClick(Sender: TObject);
+var
+  rect: TRect;
+begin
+  GetWindowRect(gameHandle, rect);
+  gameX := 0;
+  gameY := 0;
+  gameWidth := rect.Width;
+  gameHeight := rect.Height;
+end;
+
 procedure TFormMain.menuDefaultClick(Sender: TObject);
 var
   rect: TRect;
@@ -376,6 +390,8 @@ begin
   Timer.Enabled := true;
 
   GetWindowRect(gameHandle, rect);
+  gameX := 0;
+  gameY := 0;
   gameWidth := rect.Width;
   gameHeight := rect.Height;
 
@@ -534,7 +550,7 @@ end;
 procedure TFormMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
-  gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
+  x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
   _message: TMessage;
 begin
   if not (ssAlt in Shift) then Exit;
@@ -542,11 +558,16 @@ begin
   gameXend := gameX + gameWidth;
   gameYend := gameY + gameHeight;
 
-  _gameX := (mouseDown.X * gameXend - mouseDown.X * gameX + Width * gameX) / Width;
-  _gameY := (mouseDown.Y * gameYend - mouseDown.Y * gameY + Height * gameY) / Height;
+  x1 := Min(mouseDown.X, X);
+  x2 := Max(mouseDown.X, X);
+  y1 := Min(mouseDown.Y, Y);
+  y2 := Max(mouseDown.Y, Y);
 
-  _gameWidth := (X * gameXend - X * gameX + Width * gameX) / Width - _gameX;
-  _gameHeight := (Y * gameYend - Y * gameY + Height * gameY) / Height - _gameY;
+  _gameX := (x1 * gameXend - x1 * gameX + Width * gameX) / Width;
+  _gameY := (y1 * gameYend - y1 * gameY + Height * gameY) / Height;
+
+  _gameWidth := (x2 * gameXend - x2 * gameX + Width * gameX) / Width - _gameX;
+  _gameHeight := (y2 * gameYend - y2 * gameY + Height * gameY) / Height - _gameY;
 
   gameX := round(_gameX);
   gameY := round(_gameY);
