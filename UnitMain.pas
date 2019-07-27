@@ -88,6 +88,8 @@ procedure TFormMain.saveProportion();
 var
   aspectRatio: double;
 begin
+  if not menuWindowProportion.Checked then Exit;
+
   Width := Round(Height * gameWidth / gameHeight);
 end;
 
@@ -204,8 +206,8 @@ begin
     begin
       if Succeeded(DwmRegisterThumbnail(Handle,ProgmanHandle,@PH))then
          begin
-           Props.dwFlags:=DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
-                          DWM_TNP_OPACITY;
+           Props.dwFlags := DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
+                            DWM_TNP_OPACITY;
 
            Props.fSourceClientAreaOnly := false;
            Props.fVisible := true;
