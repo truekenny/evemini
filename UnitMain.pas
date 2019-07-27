@@ -85,6 +85,13 @@ implementation
 
 {$R *.dfm}
 
+// Global
+function Point(AX, AY: Integer): TPoint;
+begin
+  Result.X := AX;
+  Result.Y := AY;
+end;
+
 procedure TFormMain.saveProportion();
 begin
   if not menuWindowProportion.Checked then Exit;
