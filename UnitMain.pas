@@ -340,12 +340,18 @@ begin
 end;
 
 procedure TFormMain.menuDefaultClick(Sender: TObject);
+var
+  rect: TRect;
 begin
   DwmUnregisterThumbnail(PH);
   gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
   Caption := 'Evemini - ' + windowName;
   Timer.Enabled := true;
+
+  GetWindowRect(gameHandle, rect);
+  gameWidth := rect.Width;
+  gameHeight := rect.Height;
 
   generateConfigFilename;
   registerThumbnail;
