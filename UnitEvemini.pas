@@ -445,8 +445,8 @@ end;
 procedure TFormEvemini.menuNewClick(Sender: TObject);
 begin
   SetLength(FormEvemini, Length(FormEvemini) + 1);
-  Application.CreateForm(TFormEvemini, FormEvemini[1]);
-  FormEvemini[1].initialize(1);
+  Application.CreateForm(TFormEvemini, FormEvemini[Length(FormEvemini) - 1]);
+  FormEvemini[Length(FormEvemini) - 1].initialize(Length(FormEvemini) - 1);
 end;
 
 procedure TFormEvemini.menuQuitClick(Sender: TObject);

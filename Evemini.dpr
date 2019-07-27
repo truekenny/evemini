@@ -18,10 +18,9 @@ begin
   // Default form
   Application.CreateForm(TFormEveminiMain, FormEveminiMain);
 
-  // First window
   SetLength(FormEvemini, Length(FormEvemini) + 1);
-  Application.CreateForm(TFormEvemini, FormEvemini[0]);
-  FormEvemini[0].initialize(0);
+  Application.CreateForm(TFormEvemini, FormEvemini[Length(FormEvemini) - 1]);
+  FormEvemini[Length(FormEvemini) - 1].initialize(Length(FormEvemini) - 1);
 
   Application.Run;
 end.
