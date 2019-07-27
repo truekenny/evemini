@@ -25,7 +25,7 @@ begin
   SetLength(params, ParamCount);
   for index := 0 to ParamCount - 1 do begin
     params[index] := ParamStr(index + 1);
-    sendParams := sendParams + ';' + ParamStr(index + 1);
+    sendParams := sendParams + ParamStr(index + 1) + ';';
   end;
 
 
@@ -34,7 +34,7 @@ begin
     with aCopyData do
        begin
          dwData := 0;
-         cbData := StrLen(PChar(sendParams)) + 1;
+         cbData := 2 * Length(sendParams) + 1; // 2* - utf8
          lpData := PChar(sendParams);
        end;
 

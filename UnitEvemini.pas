@@ -12,6 +12,7 @@ type
     procedure TimerCheckFormsTimer(Sender: TObject);
   private
     { Private declarations }
+    procedure WMCopyData(var Msg: TWMCopyData); message WM_COPYDATA;
   public
     { Public declarations }
   end;
@@ -22,6 +23,17 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TFormEvemini.WMCopyData(var Msg: TWMCopyData);
+var
+  getParams: string;
+
+begin
+  getParams := PChar(Msg.CopyDataStruct.lpData);
+
+
+
+end;
 
 procedure TFormEvemini.TimerCheckFormsTimer(Sender: TObject);
 var
