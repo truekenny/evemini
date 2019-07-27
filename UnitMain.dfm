@@ -66,18 +66,18 @@ object FormMain: TFormMain
       Caption = '-'
     end
     object menuAlwaysVisible: TMenuItem
+      AutoCheck = True
       Caption = 'Always Visible'
-      OnClick = menuReCheck
     end
     object menuWindowMovable: TMenuItem
+      AutoCheck = True
       Caption = 'Window Movable'
       Checked = True
-      OnClick = menuReCheck
     end
     object menuWindowSizable: TMenuItem
+      AutoCheck = True
       Caption = 'Window Sizable'
       Checked = True
-      OnClick = menuReCheck
     end
     object menuWindowHalfOpacity: TMenuItem
       Caption = 'Window Half Opacity'

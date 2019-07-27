@@ -39,7 +39,6 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
-    procedure menuReCheck(Sender: TObject);
     procedure menuQuitClick(Sender: TObject);
     procedure menuSelectTargetRegionClick(Sender: TObject);
     procedure menuResizeWindow1x1Click(Sender: TObject);
@@ -326,11 +325,6 @@ begin
     Caption := 'Evemini'
   else
     Caption := 'Evemini - ' + windowName;
-end;
-
-procedure TFormMain.menuReCheck(Sender: TObject);
-begin
-    (Sender as TMenuItem).Checked := not (Sender as TMenuItem).Checked;
 end;
 
 procedure TFormMain.menuResizeWindow1x1Click(Sender: TObject);
