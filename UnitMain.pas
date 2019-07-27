@@ -29,6 +29,7 @@ type
     imageList: TImageList;
     menuWindowProportion: TMenuItem;
     menuAllTargetSpace: TMenuItem;
+    menuInvertWheel: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -279,6 +280,7 @@ begin
     ini.WriteBool('check', 'window-sizable', menuWindowSizable.Checked);
     ini.WriteBool('check', 'always-visible', menuAlwaysVisible.Checked);
     ini.WriteBool('check', 'window-proportion', menuWindowProportion.Checked);
+    ini.WriteBool('check', 'invert-wheel', menuInvertWheel.Checked);
   finally
     ini.Free;
   end;
@@ -319,6 +321,7 @@ begin
         menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
         menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
         menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
+        menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
       finally
         ini.Free;
       end;
@@ -360,6 +363,7 @@ begin
     else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
+    else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
   end;
 
@@ -604,6 +608,8 @@ begin
   // - scroll down
   // + scroll up
   direction := Round(WheelDelta / Abs(WheelDelta));
+
+  if menuInvertWheel.Checked then direction := -direction;
 
   Left := Left + Round(direction * Width * DELTA);
   Top := Top + Round(direction * Height * DELTA);

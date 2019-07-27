@@ -94,6 +94,10 @@ object FormMain: TFormMain
       Caption = 'Window Half Opacity'
       OnClick = menuWindowHalfOpacityClick
     end
+    object menuInvertWheel: TMenuItem
+      AutoCheck = True
+      Caption = 'Invert Wheel'
+    end
     object menuSeparatorQuit: TMenuItem
       Caption = '-'
     end
