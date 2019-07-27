@@ -36,8 +36,8 @@ object FormMain: TFormMain
     OnPopup = PopupActionBarPopup
     Left = 56
     Top = 8
-    object menuSelectWindow: TMenuItem
-      Caption = 'Select Window'
+    object menuSelectTarget: TMenuItem
+      Caption = 'Select Target'
       ImageIndex = 0
       object menuDefault: TMenuItem
         Caption = 'None'
@@ -52,10 +52,10 @@ object FormMain: TFormMain
         Caption = '2'
       end
     end
-    object menuSelectGameArea: TMenuItem
-      Caption = 'Select Game Area'
+    object menuSelectTargetRegion: TMenuItem
+      Caption = 'Select Target Region'
       ImageIndex = 1
-      OnClick = menuSelectGameAreaClick
+      OnClick = menuSelectTargetRegionClick
     end
     object menuResizeWindow1x1: TMenuItem
       Caption = 'Resize Window 1x1'

@@ -12,14 +12,14 @@ type
   TFormMain = class(TForm)
     Timer: TTimer;
     PopupActionBar: TPopupActionBar;
-    menuSelectWindow: TMenuItem;
+    menuSelectTarget: TMenuItem;
     menuDefault: TMenuItem;
     N11: TMenuItem;
     N21: TMenuItem;
     menuAlwaysVisible: TMenuItem;
     menuSeparatorChecks: TMenuItem;
     menuQuit: TMenuItem;
-    menuSelectGameArea: TMenuItem;
+    menuSelectTargetRegion: TMenuItem;
     menuSeparatorQuit: TMenuItem;
     menuWindowMovable: TMenuItem;
     menuWindowSizable: TMenuItem;
@@ -41,7 +41,7 @@ type
     procedure menuDefaultClick(Sender: TObject);
     procedure menuReCheck(Sender: TObject);
     procedure menuQuitClick(Sender: TObject);
-    procedure menuSelectGameAreaClick(Sender: TObject);
+    procedure menuSelectTargetRegionClick(Sender: TObject);
     procedure menuResizeWindow1x1Click(Sender: TObject);
     procedure menuWindowHalfOpacityClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -356,7 +356,7 @@ begin
   Close();
 end;
 
-procedure TFormMain.menuSelectGameAreaClick(Sender: TObject);
+procedure TFormMain.menuSelectTargetRegionClick(Sender: TObject);
 var
   rect: TRect;
 begin
@@ -405,7 +405,7 @@ begin
     then begin
         // ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
 
-        menuItem := TMenuItem.Create(FormMain.menuSelectWindow);
+        menuItem := TMenuItem.Create(FormMain.menuSelectTarget);
         menuItem.Caption := StrPas(HoldString);
         menuItem.OnClick :=  FormMain.menuDefaultClick;
         menuItem.Tag := hWindow;
@@ -443,7 +443,7 @@ begin
         if iconCount <> Formmain.imageList.Count then
           menuItem.ImageIndex := Formmain.imageList.Count - 1;
 
-        FormMain.menuSelectWindow.Add(menuItem);
+        FormMain.menuSelectTarget.Add(menuItem);
     end;
 
   FreeMem(HoldString, 256);
@@ -455,8 +455,8 @@ var
   index : Integer;
 begin
   // Удаляем всё
-  for index := 1 to menuSelectWindow.Count - 1 do begin
-    menuSelectWindow.Delete(1);
+  for index := 1 to menuSelectTarget.Count - 1 do begin
+    menuSelectTarget.Delete(1);
   end;
 
   //imageList.Clear;
