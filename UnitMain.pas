@@ -72,6 +72,7 @@ type
     procedure borderThumbnail(withBorder: Boolean);
     procedure generateConfigFilename();
     function isWritable(filename: string): Boolean;
+    procedure saveProportion();
   public
     { Public declarations }
   end;
@@ -82,6 +83,13 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TFormMain.saveProportion();
+var
+  aspectRatio: double;
+begin
+  Width := Round(Height * gameWidth / gameHeight);
+end;
 
 // Save proportion on resize form
 procedure TFormMain.WMSizing(var Message: TMessage);
@@ -377,6 +385,8 @@ begin
   gameY := 0;
   gameWidth := rect.Width;
   gameHeight := rect.Height;
+
+  saveProportion();
 end;
 
 procedure TFormMain.menuDefaultClick(Sender: TObject);
@@ -394,6 +404,8 @@ begin
   gameY := 0;
   gameWidth := rect.Width;
   gameHeight := rect.Height;
+
+  saveProportion();
 
   generateConfigFilename;
   registerThumbnail;
@@ -574,6 +586,8 @@ begin
 
   gameWidth := round(_gameWidth);
   gameHeight := round(_gameHeight);
+
+  saveProportion();
 end;
 
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -593,6 +607,8 @@ begin
   Top := Top + Round(direction * Height * DELTA);
   Width:= Width - Round(direction * 2 * Width * DELTA);
   Height := Height - Round(direction * 2 * Height * DELTA);
+
+  saveProportion();
 end;
 
 // Resize bsNone
