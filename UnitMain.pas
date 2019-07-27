@@ -26,6 +26,7 @@ type
     menuResizeWindow1x1: TMenuItem;
     menuWindowHalfOpacity: TMenuItem;
     imageList: TImageList;
+
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -46,6 +47,16 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
+    windowName: string;
+    gameX: Integer;
+    gameY: Integer;
+    gameWidth: Integer;
+    gameHeight: Integer;
+    gameHandle: Cardinal;
+    config: string;
+
+    PH: HTHUMBNAIL;
+
     procedure explode(var a: array of string; Border, S: string);
     function getHandle(): Cardinal;
     procedure fresh();
@@ -53,22 +64,12 @@ type
     procedure borderThumbnail(withBorder: Boolean);
     procedure generateConfigFilename();
     function isWritable(filename: string): Boolean;
-
   public
     { Public declarations }
   end;
 
 var
   FormMain: TFormMain;
-  windowName: string;
-  gameX: Integer = 0;
-  gameY: Integer = 0;
-  gameWidth: Integer = 0;
-  gameHeight: Integer = 0;
-  gameHandle: Cardinal = 0;
-  config: string;
-
-  PH: HTHUMBNAIL;
 
 implementation
 
@@ -343,6 +344,7 @@ begin
   DwmUnregisterThumbnail(PH);
   gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
+  Caption := 'Evemini - ' + windowName;
   Timer.Enabled := true;
 
   generateConfigFilename;
