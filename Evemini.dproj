@@ -73,7 +73,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_RunParams>--window-name=&quot;Calculator&quot; --form-left=200</Debugger_RunParams>
+        <Debugger_RunParams>--window-name=&quot;Calculator&quot; --form-left=200 --window-sizable=false</Debugger_RunParams>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>

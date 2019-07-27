@@ -83,6 +83,8 @@ type
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string);
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
 end;
 
 var
@@ -91,6 +93,13 @@ var
 implementation
 
 {$R *.dfm}
+
+// Always On Top
+procedure TFormWindow.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  Params.WndParent := 0;
+end;
 
 procedure TFormWindow.saveProportion();
 begin
@@ -705,6 +714,9 @@ end;
 
 procedure TFormWindow.FormActivate(Sender: TObject);
 begin
+  // Always On Top
+  SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE);
+
   // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,
                 GetWindowLong(Handle, GWL_EXSTYLE) or
@@ -717,6 +729,9 @@ end;
 
 procedure TFormWindow.FormShow(Sender: TObject);
 begin
+  // Always On Top
+  SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE);
+
   // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,
                 GetWindowLong(Handle, GWL_EXSTYLE) or
