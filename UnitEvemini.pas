@@ -32,6 +32,8 @@ type
     menuInvertWheel: TMenuItem;
     labelBuild: TLabel;
     labelHelp: TLabel;
+    menuNew: TMenuItem;
+    menuSeparatorNew: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -53,6 +55,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure menuAllTargetSpaceClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure menuNewClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -437,6 +440,13 @@ begin
   registerThumbnail;
 
   saveProportion();
+end;
+
+procedure TFormEvemini.menuNewClick(Sender: TObject);
+begin
+  SetLength(FormEvemini, Length(FormEvemini) + 1);
+  Application.CreateForm(TFormEvemini, FormEvemini[1]);
+  FormEvemini[1].initialize(1);
 end;
 
 procedure TFormEvemini.menuQuitClick(Sender: TObject);

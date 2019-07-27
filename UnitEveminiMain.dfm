@@ -2,8 +2,8 @@ object FormEveminiMain: TFormEveminiMain
   Left = 0
   Top = 0
   Caption = 'FormEveminiMain'
-  ClientHeight = 411
-  ClientWidth = 852
+  ClientHeight = 187
+  ClientWidth = 276
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

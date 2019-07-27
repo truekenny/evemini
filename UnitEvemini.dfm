@@ -105,6 +105,13 @@ object FormEvemini: TFormEvemini
       ImageIndex = 3
       OnClick = menuAllTargetSpaceClick
     end
+    object menuSeparatorNew: TMenuItem
+      Caption = '-'
+    end
+    object menuNew: TMenuItem
+      Caption = 'New...'
+      OnClick = menuNewClick
+    end
     object menuSeparatorChecks: TMenuItem
       Caption = '-'
     end
