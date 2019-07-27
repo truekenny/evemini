@@ -100,8 +100,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UnitMain.pas">
-            <Form>FormMain</Form>
+        <DCCReference Include="UnitEvemini.pas">
+            <Form>FormEvemini</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="UnitProcessLibrary.pas"/>

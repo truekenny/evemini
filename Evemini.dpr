@@ -2,7 +2,7 @@ program Evemini;
 
 uses
   Vcl.Forms,
-  UnitMain in 'UnitMain.pas' {FormMain},
+  UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitProcessLibrary in 'UnitProcessLibrary.pas',
   UnitGetBuild in 'UnitGetBuild.pas';
 
@@ -11,6 +11,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := False;
-  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormEvemini, FormEvemini);
   Application.Run;
 end.

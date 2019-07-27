@@ -1,4 +1,4 @@
-unit UnitMain;
+unit UnitEvemini;
 
 interface
 
@@ -10,7 +10,7 @@ uses
   Math, UnitGetBuild;
 
 type
-  TFormMain = class(TForm)
+  TFormEvemini = class(TForm)
     Timer: TTimer;
     PopupActionBar: TPopupActionBar;
     menuSelectTarget: TMenuItem;
@@ -82,7 +82,7 @@ type
   end;
 
 var
-  FormMain: TFormMain;
+  FormEvemini: TFormEvemini;
 
 implementation
 
@@ -95,7 +95,7 @@ begin
   Result.Y := AY;
 end;
 
-procedure TFormMain.saveProportion();
+procedure TFormEvemini.saveProportion();
 begin
   if not menuWindowProportion.Checked then Exit;
 
@@ -104,7 +104,7 @@ begin
 end;
 
 // Save proportion on resize form
-procedure TFormMain.WMSizing(var Message: TMessage);
+procedure TFormEvemini.WMSizing(var Message: TMessage);
 var
   aspectRatio: double;
 begin
@@ -128,7 +128,7 @@ begin
   borderThumbnail(gameHandle = GetForegroundWindow);
 end;
 
-function TFormMain.isWritable(filename: string): Boolean;
+function TFormEvemini.isWritable(filename: string): Boolean;
 var
   H: THandle;
 begin
@@ -138,7 +138,7 @@ begin
   if Result then CloseHandle(H);
 end;
 
-procedure TFormMain.generateConfigFilename();
+procedure TFormEvemini.generateConfigFilename();
 var
   RegEx: TRegEx;
 begin
@@ -153,17 +153,17 @@ begin
   config := ExtractFilePath(ParamStr(0)) + config + '.ini';
 end;
 
-function TFormMain.getHandle(): Cardinal;
+function TFormEvemini.getHandle(): Cardinal;
 begin
   Result := FindWindow(nil, PChar(windowName));
 end;
 
-procedure TFormMain.TimerTimer(Sender: TObject);
+procedure TFormEvemini.TimerTimer(Sender: TObject);
 begin
   fresh;
 end;
 
-procedure TFormMain.explode(var a: array of string; Border, S: string);
+procedure TFormEvemini.explode(var a: array of string; Border, S: string);
 var
   S2: string;
   i: Integer;
@@ -177,7 +177,7 @@ begin
   until S2 = '';
 end;
 
-procedure TFormMain.fresh;
+procedure TFormEvemini.fresh;
 var
   _handle: Cardinal;
 begin
@@ -208,7 +208,7 @@ begin
   end;
 end;
 
-procedure TFormMain.registerThumbnail();
+procedure TFormEvemini.registerThumbnail();
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
   ProgmanHandle: THandle;
@@ -242,7 +242,7 @@ begin
     end;
 end;
 
-procedure TFormMain.borderThumbnail(withBorder: Boolean);
+procedure TFormEvemini.borderThumbnail(withBorder: Boolean);
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
   borderWidth: Integer;
@@ -273,7 +273,7 @@ begin
   end;
 end;
 
-procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFormEvemini.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
 begin
@@ -304,7 +304,7 @@ begin
   end;
 end;
 
-procedure TFormMain.FormCreate(Sender: TObject);
+procedure TFormEvemini.FormCreate(Sender: TObject);
 var
   index: Integer;
   param, key, value: string;
@@ -397,13 +397,13 @@ begin
     Caption := 'Evemini - ' + windowName;
 end;
 
-procedure TFormMain.menuResizeWindow1x1Click(Sender: TObject);
+procedure TFormEvemini.menuResizeWindow1x1Click(Sender: TObject);
 begin
   Width := gameWidth;
   Height := gameHeight;
 end;
 
-procedure TFormMain.menuAllTargetSpaceClick(Sender: TObject);
+procedure TFormEvemini.menuAllTargetSpaceClick(Sender: TObject);
 var
   rect: TRect;
 begin
@@ -416,7 +416,7 @@ begin
   saveProportion();
 end;
 
-procedure TFormMain.menuDefaultClick(Sender: TObject);
+procedure TFormEvemini.menuDefaultClick(Sender: TObject);
 var
   rect: TRect;
 begin
@@ -438,12 +438,12 @@ begin
   saveProportion();
 end;
 
-procedure TFormMain.menuQuitClick(Sender: TObject);
+procedure TFormEvemini.menuQuitClick(Sender: TObject);
 begin
   Close();
 end;
 
-procedure TFormMain.menuSelectTargetRegionClick(Sender: TObject);
+procedure TFormEvemini.menuSelectTargetRegionClick(Sender: TObject);
 var
   rect: TRect;
 begin
@@ -456,7 +456,7 @@ begin
   gameHeight := Height;
 end;
 
-procedure TFormMain.menuWindowHalfOpacityClick(Sender: TObject);
+procedure TFormEvemini.menuWindowHalfOpacityClick(Sender: TObject);
 begin
   menuWindowHalfOpacity.Checked := not menuWindowHalfOpacity.Checked;
   AlphaBlend := menuWindowHalfOpacity.Checked;
@@ -492,13 +492,13 @@ begin
     then begin
         // ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
 
-        menuItem := TMenuItem.Create(FormMain.menuSelectTarget);
+        menuItem := TMenuItem.Create(FormEvemini.menuSelectTarget);
         menuItem.Caption := StrPas(HoldString);
-        menuItem.OnClick :=  FormMain.menuDefaultClick;
+        menuItem.OnClick :=  FormEvemini.menuDefaultClick;
         menuItem.Tag := hWindow;
 
 
-        iconCount := Formmain.imageList.Count;
+        iconCount := FormEvemini.imageList.Count;
         // Big icon from window
         HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
@@ -521,23 +521,23 @@ begin
         try
           Icon.ReleaseHandle;
           Icon.Handle := HIco;
-          Formmain.imageList.AddIcon(Icon);
+          FormEvemini.imageList.AddIcon(Icon);
         finally
           Icon.Free;
         end;
 
 
-        if iconCount <> Formmain.imageList.Count then
-          menuItem.ImageIndex := Formmain.imageList.Count - 1;
+        if iconCount <> FormEvemini.imageList.Count then
+          menuItem.ImageIndex := FormEvemini.imageList.Count - 1;
 
-        FormMain.menuSelectTarget.Add(menuItem);
+        FormEvemini.menuSelectTarget.Add(menuItem);
     end;
 
   FreeMem(HoldString, 256);
   Result := True;
 end;
 
-procedure TFormMain.PopupActionBarPopup(Sender: TObject);
+procedure TFormEvemini.PopupActionBarPopup(Sender: TObject);
 var
   index : Integer;
 begin
@@ -553,7 +553,7 @@ begin
   EnumWindows(@EnumWindowsProc, 0);
 end;
 
-procedure TFormMain.FormDblClick(Sender: TObject);
+procedure TFormEvemini.FormDblClick(Sender: TObject);
 begin
   if WindowState = wsMaximized then begin
     WindowState := wsNormal;
@@ -562,7 +562,7 @@ begin
   end;
 end;
 
-procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TFormEvemini.FormMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   _formPosition: TPoint;
@@ -586,7 +586,7 @@ begin
   else if Button = mbMiddle then Close();
 end;
 
-procedure TFormMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
+procedure TFormEvemini.FormMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
@@ -616,7 +616,7 @@ begin
   saveProportion();
 end;
 
-procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+procedure TFormEvemini.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 const
   DELTA = 0.05;
@@ -639,7 +639,7 @@ begin
   saveProportion();
 end;
 
-procedure TFormMain.FormResize(Sender: TObject);
+procedure TFormEvemini.FormResize(Sender: TObject);
 var
   _visible: Boolean;
 begin
@@ -650,7 +650,7 @@ begin
 end;
 
 // Resize bsNone
-procedure TFormMain.WMNCHitTest(var Message: TWMNCHitTest);
+procedure TFormEvemini.WMNCHitTest(var Message: TWMNCHitTest);
 const
   EDGEDETECT = 7; // adjust
 var
@@ -686,7 +686,7 @@ begin
     end;
 end;
 
-procedure TFormMain.FormActivate(Sender: TObject);
+procedure TFormEvemini.FormActivate(Sender: TObject);
 begin
   // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,
@@ -698,7 +698,7 @@ begin
   ShowWindow(Application.Handle, SW_HIDE);
 end;
 
-procedure TFormMain.FormShow(Sender: TObject);
+procedure TFormEvemini.FormShow(Sender: TObject);
 begin
   // - AltTab
   SetWindowLong(Handle, GWL_EXSTYLE,

@@ -1,9 +1,9 @@
-object FormMain: TFormMain
+object FormEvemini: TFormEvemini
   Left = 0
   Top = 0
   AlphaBlendValue = 170
   BorderStyle = bsNone
-  Caption = 'FormMain'
+  Caption = 'Evemini'
   ClientHeight = 248
   ClientWidth = 378
   Color = clBtnFace
