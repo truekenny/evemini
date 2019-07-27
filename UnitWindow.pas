@@ -451,6 +451,8 @@ begin
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
   FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params);
+
+  params := nil;
 end;
 
 procedure TFormWindow.menuQuitClick(Sender: TObject);

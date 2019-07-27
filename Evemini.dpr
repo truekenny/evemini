@@ -27,9 +27,12 @@ begin
   // Default form
   Application.CreateForm(TFormEvemini, FormEvemini);
 
+  // First Window
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
   FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params);
+
+  params := nil;
 
   Application.Run;
 end.
