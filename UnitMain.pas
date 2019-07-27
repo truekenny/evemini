@@ -86,8 +86,6 @@ implementation
 {$R *.dfm}
 
 procedure TFormMain.saveProportion();
-var
-  aspectRatio: double;
 begin
   if not menuWindowProportion.Checked then Exit;
 
@@ -235,6 +233,8 @@ procedure TFormMain.borderThumbnail(withBorder: Boolean);
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
   borderWidth: Integer;
+  gameBorderWidth: Integer;
+  gameBorderHeight: Integer;
 begin
   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
@@ -242,10 +242,13 @@ begin
   then borderWidth := 3
   else borderWidth := 0;
 
+  gameBorderWidth := Round(borderWidth * gameWidth / Width);
+  gameBorderHeight := Round(borderWidth * gameHeight / Height);
+
   Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
   Props.rcSource := Rect(
-    Point(gameX + borderWidth ,gameY + borderWidth),
-    Point(gameX + gameWidth - borderWidth, gameY + gameHeight - borderWidth)
+    Point(gameX + gameBorderWidth ,gameY + gameBorderHeight),
+    Point(gameX + gameWidth - gameBorderWidth, gameY + gameHeight - gameBorderHeight)
   );
 
   if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
@@ -569,7 +572,6 @@ procedure TFormMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
-  _message: TMessage;
 begin
   if not (ssAlt in Shift) then Exit;
 
