@@ -268,6 +268,8 @@ procedure TFormWindow.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
 begin
+  Action := caFree;
+
   Timer.Enabled := False;
   FormWindow[windowIndex] := nil;
 
