@@ -508,8 +508,8 @@ begin
   end;
 
   //imageList.Clear;
-  for index := 3 to imageList.Count - 1 do
-    imageList.Delete(3);
+  for index := 4 to imageList.Count - 1 do
+    imageList.Delete(4);
 
   EnumWindows(@EnumWindowsProc, 0);
 end;
