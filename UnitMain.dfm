@@ -20,6 +20,7 @@ object FormMain: TFormMain
   OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnMouseDown = FormMouseDown
+  OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
   OnShow = FormShow
   PixelsPerInch = 96
@@ -77,6 +78,11 @@ object FormMain: TFormMain
     object menuWindowSizable: TMenuItem
       AutoCheck = True
       Caption = 'Window Sizable'
+      Checked = True
+    end
+    object menuWindowProportion: TMenuItem
+      AutoCheck = True
+      Caption = 'Window Proportion'
       Checked = True
     end
     object menuWindowHalfOpacity: TMenuItem

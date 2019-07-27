@@ -26,6 +26,7 @@ type
     menuResizeWindow1x1: TMenuItem;
     menuWindowHalfOpacity: TMenuItem;
     imageList: TImageList;
+    menuWindowProportion: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -44,6 +45,9 @@ type
     procedure menuResizeWindow1x1Click(Sender: TObject);
     procedure menuWindowHalfOpacityClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure WMSizing(var Message: TMessage); message WM_SIZING;
+    procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     windowName: string;
@@ -55,6 +59,8 @@ type
     config: string;
 
     PH: HTHUMBNAIL;
+
+    mouseDown: TPoint;
 
     procedure explode(var a: array of string; Border, S: string);
     function getHandle(): Cardinal;
@@ -73,6 +79,29 @@ var
 implementation
 
 {$R *.dfm}
+
+// Save proportion on resize form
+procedure TFormMain.WMSizing(var Message: TMessage);
+var
+  aspectRatio: double;
+begin
+  if not menuWindowProportion.Checked then Exit;
+
+  aspectRatio := gameWidth / gameHeight;
+
+  case Message.wParam of
+    WMSZ_LEFT, WMSZ_RIGHT, WMSZ_BOTTOMLEFT:
+      with PRect(Message.LParam)^ do
+        Bottom := Top + Round((Right-Left)/aspectRatio);
+    WMSZ_TOP, WMSZ_BOTTOM, WMSZ_TOPRIGHT, WMSZ_BOTTOMRIGHT:
+      with PRect(Message.LParam)^ do
+        Right := Left + Round((Bottom-Top)*aspectRatio);
+    WMSZ_TOPLEFT:
+      with PRect(Message.LParam)^ do
+        Top := Bottom - Round((Right-Left)/aspectRatio);
+  end;
+  inherited;
+end;
 
 function TFormMain.isWritable(filename: string): Boolean;
 var
@@ -236,6 +265,7 @@ begin
     ini.WriteBool('check', 'window-movable', menuWindowMovable.Checked);
     ini.WriteBool('check', 'window-sizable', menuWindowSizable.Checked);
     ini.WriteBool('check', 'always-visible', menuAlwaysVisible.Checked);
+    ini.WriteBool('check', 'window-proportion', menuWindowProportion.Checked);
   finally
     ini.Free;
   end;
@@ -275,6 +305,7 @@ begin
         menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
         menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
         menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
+        menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
       finally
         ini.Free;
       end;
@@ -315,6 +346,7 @@ begin
 
     else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
+    else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
   end;
 
@@ -480,6 +512,9 @@ procedure TFormMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
 var
   _formPosition: TPoint;
 begin
+  mouseDown := Point(X, Y);
+ if ssAlt in Shift then Exit;
+
   _formPosition := Point(Left, Top);
   // Move form
   if (Button = mbLeft) and (menuWindowMovable.Checked) then begin
@@ -494,6 +529,30 @@ begin
     end;
   end
   else if Button = mbMiddle then Close();
+end;
+
+procedure TFormMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
+  _message: TMessage;
+begin
+  if not (ssAlt in Shift) then Exit;
+
+  gameXend := gameX + gameWidth;
+  gameYend := gameY + gameHeight;
+
+  _gameX := (mouseDown.X * gameXend - mouseDown.X * gameX + Width * gameX) / Width;
+  _gameY := (mouseDown.Y * gameYend - mouseDown.Y * gameY + Height * gameY) / Height;
+
+  _gameWidth := (X * gameXend - X * gameX + Width * gameX) / Width - _gameX;
+  _gameHeight := (Y * gameYend - Y * gameY + Height * gameY) / Height - _gameY;
+
+  gameX := round(_gameX);
+  gameY := round(_gameY);
+
+  gameWidth := round(_gameWidth);
+  gameHeight := round(_gameHeight);
 end;
 
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
