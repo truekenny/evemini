@@ -268,6 +268,7 @@ procedure TFormWindow.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
 begin
+  DwmUnregisterThumbnail(PH);
   Action := caFree;
 
   Timer.Enabled := False;
@@ -482,9 +483,11 @@ end;
 // Global
 function EnumWindowsProc(hWindow: HWND; _windowIndex:Cardinal): Bool; stdcall;
 var
-  HoldString: PChar;
-  WindowStyle: Longint;
-  IsAChild: Word;
+  titleLength: Integer;
+  titleChars: PChar;
+  title: String;
+  windowStyle: Longint;
+  visibleWindow: LongInt;
 
   menuItem : TMenuItem;
 
@@ -497,20 +500,20 @@ var
   indexIcon: Word;
 begin
   indexIcon := 0;
-  GetMem(HoldString, 256);
+  GetMem(titleChars, 256);
 
-  WindowStyle := GetWindowLong(hWindow, GWL_STYLE);
-  WindowStyle := WindowStyle and Longint(WS_VISIBLE);
-  IsAChild := GetWindowWord(hWindow, GWL_HWNDPARENT);
+  windowStyle := GetWindowLong(hWindow, GWL_STYLE);
+  visibleWindow := windowStyle and Longint(WS_VISIBLE);
 
-  if (GetWindowText(hWindow, HoldString, 255) > 0)
-    and (WindowStyle > 0)
-    and (IsAChild = Word(nil))
+  titleLength := GetWindowText(hWindow, titleChars, 255);
+  title := titleChars;
+
+  if (titleLength > 0)
+    and (Pos('Evemini', title) = 0)
+    and (visibleWindow > 0)
     then begin
-        // ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
-
         menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
-        menuItem.Caption := StrPas(HoldString);
+        menuItem.Caption := title;
         menuItem.OnClick :=  FormWindow[_windowIndex].menuDefaultClick;
         menuItem.Tag := hWindow;
 
@@ -550,7 +553,7 @@ begin
         FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
     end;
 
-  FreeMem(HoldString, 256);
+  FreeMem(titleChars, 256);
   Result := True;
 end;
 
