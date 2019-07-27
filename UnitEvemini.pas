@@ -82,7 +82,7 @@ type
     procedure saveProportion();
   public
     { Public declarations }
-    procedure initialize(_windowIndex: Integer);
+    procedure initialize(_windowIndex: Integer; params: array of string);
 end;
 
 var
@@ -305,7 +305,7 @@ begin
 
 end;
 
-procedure TFormEvemini.initialize(_windowIndex: Integer);
+procedure TFormEvemini.initialize(_windowIndex: Integer; params: array of string);
 var
   index: Integer;
   param, key, value: string;
@@ -321,8 +321,8 @@ begin
 
   SetLength(pair, 2);
 
-  for index := 1 to ParamCount do begin
-    param := ParamStr(index);
+  for index := 0 to Length(params) - 1 do begin
+    param := params[index];
 
     if FileExists(param) then begin
       config := param;
@@ -443,10 +443,14 @@ begin
 end;
 
 procedure TFormEvemini.menuNewClick(Sender: TObject);
+var
+  params: array of string;
 begin
+  SetLength(params, 0);
+
   SetLength(FormEvemini, Length(FormEvemini) + 1);
   Application.CreateForm(TFormEvemini, FormEvemini[Length(FormEvemini) - 1]);
-  FormEvemini[Length(FormEvemini) - 1].initialize(Length(FormEvemini) - 1);
+  FormEvemini[Length(FormEvemini) - 1].initialize(Length(FormEvemini) - 1, params);
 end;
 
 procedure TFormEvemini.menuQuitClick(Sender: TObject);
@@ -558,8 +562,8 @@ begin
   end;
 
   //imageList.Clear;
-  for index := 4 to imageList.Count - 1 do
-    imageList.Delete(4);
+  for index := 5 to imageList.Count - 1 do
+    imageList.Delete(5);
 
   EnumWindows(@EnumWindowsProc, windowIndex);
 end;
