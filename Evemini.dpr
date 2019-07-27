@@ -1,7 +1,7 @@
 program Evemini;
 
 uses
-  Vcl.Forms,
+  Vcl.Forms, Windows, System.SysUtils,
   UnitWindow in 'UnitWindow.pas' {FormWindow},
   UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitGetBuild in 'UnitGetBuild.pas',
@@ -10,14 +10,37 @@ uses
 
 {$R *.res}
 
+const
+  WM_COPYDATA = 74;
+
 var
   params: array of string;
   index: Integer;
 
+  targetHwnd: Cardinal;
+  sendParams: string;
+  aCopyData: TCopyDataStruct;
+
 begin
   SetLength(params, ParamCount);
-  for index := 0 to ParamCount - 1 do
+  for index := 0 to ParamCount - 1 do begin
     params[index] := ParamStr(index + 1);
+    sendParams := sendParams + ';' + ParamStr(index + 1);
+  end;
+
+
+  targetHwnd := FindWindow('TFormEvemini', nil);
+  if targetHwnd <> 0 then begin
+    with aCopyData do
+       begin
+         dwData := 0;
+         cbData := StrLen(PChar(sendParams)) + 1;
+         lpData := PChar(sendParams);
+       end;
+
+    SendMessage(targetHwnd, WM_COPYDATA, Application.Handle, Longint(@aCopyData));
+    exit;
+  end;
 
 
   Application.Initialize;
