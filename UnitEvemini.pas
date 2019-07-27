@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
   Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
-  Math, UnitGetBuild;
+  Math, UnitGetBuild, UnitInlineMacros;
 
 type
   TFormEvemini = class(TForm)
@@ -32,8 +32,6 @@ type
     menuInvertWheel: TMenuItem;
     labelBuild: TLabel;
     labelHelp: TLabel;
-
-    procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -57,6 +55,8 @@ type
     procedure FormResize(Sender: TObject);
   private
     { Private declarations }
+    windowIndex: Integer;
+
     windowName: string;
     gameX: Integer;
     gameY: Integer;
@@ -79,21 +79,15 @@ type
     procedure saveProportion();
   public
     { Public declarations }
+    procedure initialize();
   end;
 
 var
-  FormEvemini: TFormEvemini;
+  FormEvemini: array of TFormEvemini;
 
 implementation
 
 {$R *.dfm}
-
-// Global
-function Point(AX, AY: Integer): TPoint;
-begin
-  Result.X := AX;
-  Result.Y := AY;
-end;
 
 procedure TFormEvemini.saveProportion();
 begin
@@ -304,7 +298,7 @@ begin
   end;
 end;
 
-procedure TFormEvemini.FormCreate(Sender: TObject);
+procedure TFormEvemini.initialize();
 var
   index: Integer;
   param, key, value: string;
@@ -312,7 +306,7 @@ var
 
   ini: TIniFile;
 begin
-  OnResize(Sender);
+  FormResize(nil);
   labelBuild.Caption := GetBuildInfoAsString;
 
   SetLength(pair, 2);
@@ -463,7 +457,7 @@ begin
 end;
 
 // Global
-function EnumWindowsProc(hWindow: HWND): Bool; stdcall;
+function EnumWindowsProc(hWindow: HWND; _windowIndex:Cardinal): Bool; stdcall;
 var
   HoldString: PChar;
   WindowStyle: Longint;
@@ -492,13 +486,13 @@ begin
     then begin
         // ShowMessage(StrPas(HoldString) +'='+ IntToStr(hWindow));
 
-        menuItem := TMenuItem.Create(FormEvemini.menuSelectTarget);
+        menuItem := TMenuItem.Create(FormEvemini[_windowIndex].menuSelectTarget);
         menuItem.Caption := StrPas(HoldString);
-        menuItem.OnClick :=  FormEvemini.menuDefaultClick;
+        menuItem.OnClick :=  FormEvemini[_windowIndex].menuDefaultClick;
         menuItem.Tag := hWindow;
 
 
-        iconCount := FormEvemini.imageList.Count;
+        iconCount := FormEvemini[_windowIndex].imageList.Count;
         // Big icon from window
         HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
@@ -521,16 +515,16 @@ begin
         try
           Icon.ReleaseHandle;
           Icon.Handle := HIco;
-          FormEvemini.imageList.AddIcon(Icon);
+          FormEvemini[_windowIndex].imageList.AddIcon(Icon);
         finally
           Icon.Free;
         end;
 
 
-        if iconCount <> FormEvemini.imageList.Count then
-          menuItem.ImageIndex := FormEvemini.imageList.Count - 1;
+        if iconCount <> FormEvemini[_windowIndex].imageList.Count then
+          menuItem.ImageIndex := FormEvemini[_windowIndex].imageList.Count - 1;
 
-        FormEvemini.menuSelectTarget.Add(menuItem);
+        FormEvemini[_windowIndex].menuSelectTarget.Add(menuItem);
     end;
 
   FreeMem(HoldString, 256);
@@ -550,7 +544,7 @@ begin
   for index := 4 to imageList.Count - 1 do
     imageList.Delete(4);
 
-  EnumWindows(@EnumWindowsProc, 0);
+  EnumWindows(@EnumWindowsProc, windowIndex);
 end;
 
 procedure TFormEvemini.FormDblClick(Sender: TObject);

@@ -17,7 +17,6 @@ object FormEvemini: TFormEvemini
   PopupMenu = PopupActionBar
   OnActivate = FormActivate
   OnClose = FormClose
-  OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnMouseDown = FormMouseDown
   OnMouseUp = FormMouseUp
