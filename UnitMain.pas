@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
   Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
-  Math;
+  Math, UnitGetBuild;
 
 type
   TFormMain = class(TForm)
@@ -30,6 +30,8 @@ type
     menuWindowProportion: TMenuItem;
     menuAllTargetSpace: TMenuItem;
     menuInvertWheel: TMenuItem;
+    labelBuild: TLabel;
+    labelHelp: TLabel;
 
     procedure FormCreate(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -52,6 +54,7 @@ type
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure menuAllTargetSpaceClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
     windowName: string;
@@ -309,6 +312,9 @@ var
 
   ini: TIniFile;
 begin
+  OnResize(Sender);
+  labelBuild.Caption := GetBuildInfoAsString;
+
   SetLength(pair, 2);
 
   for index := 1 to ParamCount do begin
@@ -631,6 +637,16 @@ begin
   Height := Height - Round(direction * 2 * Height * DELTA);
 
   saveProportion();
+end;
+
+procedure TFormMain.FormResize(Sender: TObject);
+var
+  _visible: Boolean;
+begin
+  _visible := (Width > 100) and (Height > 100);
+
+  labelBuild.Visible := _visible;
+  labelHelp.Visible := _visible;
 end;
 
 // Resize bsNone

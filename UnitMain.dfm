@@ -22,21 +22,59 @@ object FormMain: TFormMain
   OnMouseDown = FormMouseDown
   OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
+  OnResize = FormResize
   OnShow = FormShow
+  DesignSize = (
+    378
+    248)
   PixelsPerInch = 96
   TextHeight = 13
+  object labelBuild: TLabel
+    Left = 335
+    Top = 224
+    Width = 35
+    Height = 12
+    Alignment = taRightJustify
+    Anchors = [akRight, akBottom]
+    Caption = '1.0.0.0'
+    Font.Charset = OEM_CHARSET
+    Font.Color = clSilver
+    Font.Height = -16
+    Font.Name = 'Terminal'
+    Font.Style = []
+    ParentFont = False
+    OnDblClick = FormDblClick
+    OnMouseDown = FormMouseDown
+    OnMouseUp = FormMouseUp
+  end
+  object labelHelp: TLabel
+    Left = 8
+    Top = 8
+    Width = 140
+    Height = 12
+    Caption = 'Right-click here to start...'
+    Font.Charset = OEM_CHARSET
+    Font.Color = clSilver
+    Font.Height = -16
+    Font.Name = 'Terminal'
+    Font.Style = []
+    ParentFont = False
+    OnDblClick = FormDblClick
+    OnMouseDown = FormMouseDown
+    OnMouseUp = FormMouseUp
+  end
   object Timer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = TimerTimer
     Left = 8
-    Top = 8
+    Top = 136
   end
   object PopupActionBar: TPopupActionBar
     Images = imageList
     OnPopup = PopupActionBarPopup
-    Left = 56
-    Top = 8
+    Left = 48
+    Top = 136
     object menuSelectTarget: TMenuItem
       Caption = 'Select Target'
       ImageIndex = 0
@@ -108,10 +146,10 @@ object FormMain: TFormMain
   end
   object imageList: TImageList
     ColorDepth = cd32Bit
-    Left = 104
-    Top = 8
+    Left = 88
+    Top = 136
     Bitmap = {
-      494C010104000800480010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101040008004C0010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

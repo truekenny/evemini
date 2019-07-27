@@ -3,7 +3,8 @@ program Evemini;
 uses
   Vcl.Forms,
   UnitMain in 'UnitMain.pas' {FormMain},
-  UnitProcessLibrary in 'UnitProcessLibrary.pas';
+  UnitProcessLibrary in 'UnitProcessLibrary.pas',
+  UnitGetBuild in 'UnitGetBuild.pas';
 
 {$R *.res}
 
