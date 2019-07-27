@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
   Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
   Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
-  Math, UnitGetBuild, UnitInlineMacros;
+  Math, UnitGetBuild, UnitInlineMacros, unitString;
 
 type
   TFormWindow = class(TForm)
@@ -72,7 +72,6 @@ type
 
     mouseDown: TPoint;
 
-    procedure explode(var a: array of string; Border, S: string);
     function getHandle(): Cardinal;
     procedure fresh();
     procedure registerThumbnail();
@@ -167,20 +166,6 @@ end;
 procedure TFormWindow.TimerTimer(Sender: TObject);
 begin
   fresh;
-end;
-
-procedure TFormWindow.explode(var a: array of string; Border, S: string);
-var
-  S2: string;
-  i: Integer;
-begin
-  i  := 0;
-  S2 := S + Border;
-  repeat
-    a[i] := Copy(S2, 0,Pos(Border, S2) - 1);
-    Delete(S2, 1,Length(a[i] + Border));
-    Inc(i);
-  until S2 = '';
 end;
 
 procedure TFormWindow.fresh;

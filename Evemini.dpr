@@ -1,17 +1,20 @@
 program Evemini;
 
 uses
-  Vcl.Forms, Windows, System.SysUtils,
+  Vcl.Forms,
+  Windows,
+  System.SysUtils,
   UnitWindow in 'UnitWindow.pas' {FormWindow},
   UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitGetBuild in 'UnitGetBuild.pas',
   UnitInlineMacros in 'UnitInlineMacros.pas',
-  UnitProcessLibrary in 'UnitProcessLibrary.pas';
-
-{$R *.res}
+  UnitProcessLibrary in 'UnitProcessLibrary.pas',
+  UnitString in 'UnitString.pas';
 
 const
   WM_COPYDATA = 74;
+
+{$R *.res}
 
 var
   params: array of string;
@@ -34,7 +37,7 @@ begin
     with aCopyData do
        begin
          dwData := 0;
-         cbData := 2 * Length(sendParams) + 1; // 2* - utf8
+         cbData := SizeOf(Char) * Length(sendParams) + 1;
          lpData := PChar(sendParams);
        end;
 
@@ -49,7 +52,6 @@ begin
 
   // Default form
   Application.CreateForm(TFormEvemini, FormEvemini);
-
   // First Window
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
