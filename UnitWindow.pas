@@ -397,9 +397,8 @@ begin
   else
     Caption := 'Evemini - ' + windowName;
 
-  if mutex <>0 then begin
+  if mutex <>0 then
     ReleaseMutex(mutex);
-  end;
 end;
 
 procedure TFormWindow.menuResizeWindow1x1Click(Sender: TObject);
