@@ -79,8 +79,8 @@ type
     procedure saveProportion();
   public
     { Public declarations }
-    procedure initialize();
-  end;
+    procedure initialize(_windowIndex: Integer);
+end;
 
 var
   FormEvemini: array of TFormEvemini;
@@ -271,6 +271,9 @@ procedure TFormEvemini.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
 begin
+  Timer.Enabled := False;
+  FormEvemini[windowIndex] := nil;
+
   if config = '' then Exit;
 
   if not isWritable(config) then Exit;
@@ -296,9 +299,10 @@ begin
   finally
     ini.Free;
   end;
+
 end;
 
-procedure TFormEvemini.initialize();
+procedure TFormEvemini.initialize(_windowIndex: Integer);
 var
   index: Integer;
   param, key, value: string;
@@ -306,6 +310,9 @@ var
 
   ini: TIniFile;
 begin
+  Visible := true;
+  windowIndex := _windowIndex;
+
   FormResize(nil);
   labelBuild.Caption := GetBuildInfoAsString;
 
