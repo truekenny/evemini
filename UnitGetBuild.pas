@@ -5,13 +5,12 @@ unit UnitGetBuild;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
-  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
-  Math;
+  System.SysUtils,
+  System.Types,
+  Winapi.Windows;
 
 procedure GetBuildInfo(var V1, V2, V3, V4: word);
+
 function GetBuildInfoAsString: string;
 
 implementation

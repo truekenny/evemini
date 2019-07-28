@@ -4,11 +4,12 @@ unit UnitProcessLibrary;
 
 interface
 
-uses Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
-  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, TlHelp32, PsAPI;
-
+uses
+  System.SysUtils,
+  Winapi.Messages,
+  Winapi.PsAPI,
+  Winapi.TlHelp32,
+  Winapi.Windows;
 
 function GetPathFromPID(const PID: cardinal): string;
 

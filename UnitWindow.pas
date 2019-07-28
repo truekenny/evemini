@@ -3,11 +3,30 @@ unit UnitWindow;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, DwmApi,
-  Vcl.Menus, Vcl.PlatformDefaultStyleActnCtrls, Vcl.ActnPopup, System.ImageList,
-  Vcl.ImgList, IniFiles, RegularExpressions, ShellApi, UnitProcessLibrary,
-  Math, UnitGetBuild, UnitInlineMacros, unitString;
+  System.Classes,
+  System.ImageList,
+  System.IniFiles,
+  System.Math,
+  System.RegularExpressions,
+  System.SysUtils,
+  UnitGetBuild,
+  UnitInlineMacros,
+  UnitProcessLibrary,
+  UnitString,
+  Vcl.ActnPopup,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.ImgList,
+  Vcl.Menus,
+  Vcl.PlatformDefaultStyleActnCtrls,
+  Vcl.StdCtrls,
+  Winapi.DwmApi,
+  Winapi.Messages,
+  Winapi.ShellApi,
+  Winapi.Windows;
 
 type
   TFormWindow = class(TForm)

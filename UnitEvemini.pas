@@ -3,10 +3,29 @@ unit UnitEvemini;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, UnitWindow, UnitString, ShellApi,
-  Vcl.Menus, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
-  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL, System.JSON;
+  IdBaseComponent,
+  IdComponent,
+  IdHTTP,
+  IdIOHandler,
+  IdIOHandlerSocket,
+  IdIOHandlerStack,
+  IdSSL,
+  IdSSLOpenSSL,
+  IdTCPClient,
+  IdTCPConnection,
+  System.Classes,
+  System.JSON,
+  System.SysUtils,
+  UnitString,
+  UnitWindow,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Menus,
+  Winapi.Messages,
+  Winapi.ShellAPI,
+  Winapi.Windows;
 
 const
   WM_ICONTRAY = WM_USER + 1;

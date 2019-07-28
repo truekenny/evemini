@@ -2,8 +2,7 @@ program Evemini;
 
 uses
   Vcl.Forms,
-  Windows,
-  System.SysUtils,
+  Winapi.Windows,
   UnitWindow in 'UnitWindow.pas' {FormWindow},
   UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitGetBuild in 'UnitGetBuild.pas',
