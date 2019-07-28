@@ -11,12 +11,28 @@ object FormEvemini: TFormEvemini
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object TimerCheckForms: TTimer
     Interval = 100
     OnTimer = TimerCheckFormsTimer
-    Left = 16
-    Top = 16
+    Left = 8
+    Top = 128
+  end
+  object popupMenu: TPopupMenu
+    Images = FormWindow.imageList
+    Left = 48
+    Top = 128
+    object New1: TMenuItem
+      Caption = 'New...'
+      ImageIndex = 4
+      OnClick = New1Click
+    end
+    object Quit1: TMenuItem
+      Caption = 'Quit'
+      OnClick = Quit1Click
+    end
   end
 end
