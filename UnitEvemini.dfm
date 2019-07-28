@@ -23,8 +23,17 @@ object FormEvemini: TFormEvemini
   end
   object popupMenu: TPopupMenu
     Images = FormWindow.imageList
+    OnPopup = popupMenuPopup
     Left = 48
     Top = 128
+    object menuWindows: TMenuItem
+      Caption = 'Windows'
+      object menuDefault: TMenuItem
+        Caption = 'default'
+        Visible = False
+        OnClick = menuDefaultClick
+      end
+    end
     object New1: TMenuItem
       Caption = 'New...'
       ImageIndex = 4

@@ -82,6 +82,8 @@ type
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
+
+    property _windowName:string read windowName;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
 end;
@@ -185,7 +187,8 @@ begin
 
     if _handle = 0 then begin
       // cant activate
-      if not menuAlwaysVisible.Checked then Visible := false;
+      Visible := menuAlwaysVisible.Checked;
+
       Color := clBtnFace;
 
     end else begin

@@ -17,11 +17,15 @@ type
     popupMenu: TPopupMenu;
     New1: TMenuItem;
     Quit1: TMenuItem;
+    menuWindows: TMenuItem;
+    menuDefault: TMenuItem;
     procedure TimerCheckFormsTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
+    procedure popupMenuPopup(Sender: TObject);
+    procedure menuDefaultClick(Sender: TObject);
   private
     { Private declarations }
     TrayIconData: TNotifyIconData;
@@ -77,6 +81,14 @@ begin
   Shell_NotifyIcon(NIM_DELETE, @TrayIconData);
 end;
 
+procedure TFormEvemini.menuDefaultClick(Sender: TObject);
+var
+  index: Integer;
+begin
+  index := (Sender as TMenuItem).Tag;
+  FormWindow[index].menuAlwaysVisible.Checked := True;
+end;
+
 procedure TFormEvemini.New1Click(Sender: TObject);
 var
   params: array of string;
@@ -88,6 +100,28 @@ begin
   FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params, 0);
 
   params := nil;
+end;
+
+procedure TFormEvemini.popupMenuPopup(Sender: TObject);
+var
+  index: Integer;
+  menuItem : TMenuItem;
+begin
+  menuWindows.Clear;
+
+  for index := 0 to Length(FormWindow) - 1 do begin
+    if FormWindow[index] = nil then Continue;
+
+    menuItem := TMenuItem.Create(menuWindows);
+    menuItem.Caption := FormWindow[index]._windowName;
+    menuItem.Tag := index;
+
+    if menuItem.Caption = '' then menuItem.Caption := '# new window';
+    menuItem.Caption := menuItem.Caption + ' #' + IntToStr(index);
+
+    menuItem.OnClick :=  menuDefaultClick;
+    menuWindows.Add(menuItem);
+  end;
 end;
 
 procedure TFormEvemini.Quit1Click(Sender: TObject);
