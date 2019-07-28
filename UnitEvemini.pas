@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, UnitWindow, UnitString, ShellApi,
-  Vcl.Menus;
+  Vcl.Menus, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
+  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL;
 
 const
   WM_ICONTRAY = WM_USER + 1;
@@ -19,6 +20,9 @@ type
     Quit1: TMenuItem;
     menuWindows: TMenuItem;
     menuDefault: TMenuItem;
+    menuCheckforUpdate: TMenuItem;
+    IdHTTP: TIdHTTP;
+    IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
     procedure TimerCheckFormsTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -26,6 +30,7 @@ type
     procedure New1Click(Sender: TObject);
     procedure popupMenuPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
+    procedure menuCheckforUpdateClick(Sender: TObject);
   private
     { Private declarations }
     TrayIconData: TNotifyIconData;
@@ -79,6 +84,15 @@ end;
 procedure TFormEvemini.FormDestroy(Sender: TObject);
 begin
   Shell_NotifyIcon(NIM_DELETE, @TrayIconData);
+end;
+
+procedure TFormEvemini.menuCheckforUpdateClick(Sender: TObject);
+var
+  releaseJson: string;
+begin
+  releaseJson := IdHTTP.Get('https://api.github.com/repos/truekenny/evemini/releases/latest');
+
+  if releaseJson = '' then Exit;
 end;
 
 procedure TFormEvemini.menuDefaultClick(Sender: TObject);
