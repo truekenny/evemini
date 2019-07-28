@@ -332,6 +332,8 @@ var
 
   ini: TIniFile;
 begin
+  BorderStyle := bsNone;
+
   Visible := true;
   windowIndex := _windowIndex;
 

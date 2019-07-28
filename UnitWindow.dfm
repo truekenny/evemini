@@ -2,10 +2,10 @@ object FormWindow: TFormWindow
   Left = 0
   Top = 0
   AlphaBlendValue = 170
-  BorderStyle = bsNone
+  BorderStyle = bsSingle
   Caption = 'Window'
-  ClientHeight = 248
-  ClientWidth = 378
+  ClientHeight = 221
+  ClientWidth = 394
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -24,13 +24,13 @@ object FormWindow: TFormWindow
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    378
-    248)
+    394
+    221)
   PixelsPerInch = 96
   TextHeight = 13
   object labelBuild: TLabel
-    Left = 335
-    Top = 224
+    Left = 351
+    Top = 197
     Width = 35
     Height = 12
     Alignment = taRightJustify
@@ -45,6 +45,8 @@ object FormWindow: TFormWindow
     OnDblClick = FormDblClick
     OnMouseDown = FormMouseDown
     OnMouseUp = FormMouseUp
+    ExplicitLeft = 335
+    ExplicitTop = 224
   end
   object labelHelp: TLabel
     Left = 8
@@ -156,7 +158,7 @@ object FormWindow: TFormWindow
     Left = 88
     Top = 136
     Bitmap = {
-      494C010105000800780010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010105000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
