@@ -41,6 +41,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <VerInfo_Keys>FileVersion=1.0.0.0</VerInfo_Keys>
         <VerInfo_Locale>1049</VerInfo_Locale>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
@@ -74,7 +75,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_Keys>CompanyName=Truekenny;FileDescription=https://github.com/truekenny/evemini;FileVersion=1.1.0.0;InternalName=Evemini;LegalCopyright=;LegalTrademarks=;OriginalFilename=Evemini.exe;ProductName=Evemini;ProductVersion=0.7;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Truekenny;FileDescription=Evemini Debug Version;FileVersion=1.1.0.0;InternalName=Evemini;LegalCopyright=;LegalTrademarks=;OriginalFilename=Evemini.exe;ProductName=Evemini;ProductVersion=0.7;Comments=https://github.com/truekenny/evemini</VerInfo_Keys>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
         <Debugger_RunParams>--window-name=&quot;Calculator&quot; --form-top=400 --form-left=400 --window-sizable=false</Debugger_RunParams>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
@@ -94,7 +95,7 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Keys>CompanyName=Truekenny;FileDescription=https://github.com/truekenny/evemini;FileVersion=1.1.0.0;InternalName=Evemini;LegalCopyright=;LegalTrademarks=;OriginalFilename=Evemini.exe;ProductName=Evemini;ProductVersion=0.7;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Truekenny;FileDescription=Evemini Release;FileVersion=1.1.0.0;InternalName=Evemini;LegalCopyright=;LegalTrademarks=;OriginalFilename=Evemini.exe;ProductName=Evemini;ProductVersion=0.7;Comments=https://github.com/truekenny/evemini</VerInfo_Keys>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>Evemini_Icon.ico</Icon_MainIcon>
