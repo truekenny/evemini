@@ -6,11 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, UnitWindow, UnitString, ShellApi,
   Vcl.Menus, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
-  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL;
+  IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdSSL, IdSSLOpenSSL, System.JSON;
 
 const
   WM_ICONTRAY = WM_USER + 1;
-
+  CURRENT_RELEASE = 'Second Release';
 
 type
   TFormEvemini = class(TForm)
@@ -89,10 +89,25 @@ end;
 procedure TFormEvemini.menuCheckforUpdateClick(Sender: TObject);
 var
   releaseJson: string;
+  JSON: TJSONObject;
+
+  name: string;
 begin
   releaseJson := IdHTTP.Get('https://api.github.com/repos/truekenny/evemini/releases/latest');
 
   if releaseJson = '' then Exit;
+
+  JSON := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(releaseJson),0) as TJSONObject;
+  name := JSON.Values['name'].Value;
+
+  if name = CURRENT_RELEASE then begin
+    ShowMessage('Application are up to date.');
+    Exit;
+  end;
+
+  if MessageBox(Handle, PChar('Open releases site page?'),
+    PChar('New realese '+ name), MB_YESNO + MB_ICONINFORMATION) = IDYES then
+    ShellExecute(0, 'open', 'https://github.com/truekenny/evemini/releases', nil, nil, SW_SHOWNORMAL);
 end;
 
 procedure TFormEvemini.menuDefaultClick(Sender: TObject);
