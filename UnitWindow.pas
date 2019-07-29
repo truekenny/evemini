@@ -93,7 +93,11 @@ type
 
     PH: HTHUMBNAIL;
 
+    // Выбор региона, MouseDown, MouseUp
     mouseDown: TPoint;
+
+    // Перемещение формы, WMMoving, MouseUp
+    deltaLeft: Integer;
 
     function getHandle(): Cardinal;
     procedure fresh();
@@ -161,16 +165,41 @@ procedure TFormWindow.WMMoving(var Message: TMessage);
 var
   Rect: ^TRect;
   middle: Integer;
+
 begin
   Rect:= Pointer(Message.LParam);
 
+
+
   Exit;
 
-  if Rect.Left < 5 then begin
+
+
+
+  if (Rect.Left > 180) and (Rect.Left < 220) then begin
+    deltaLeft := deltaLeft + Rect.Left - Left;
+
     middle := Rect.Width;
-    Rect.Left := 0;
+    Rect.Left := 200;
     Rect.Width := middle;
   end;
+
+  if deltaLeft >= 20 then begin
+    deltaLeft := 0;
+
+    middle := Rect.Width;
+    Rect.Left := 220;
+    Rect.Width := middle;
+  end;
+
+  if deltaLeft <= -20 then begin
+    deltaLeft := 0;
+
+    middle := Rect.Width;
+    Rect.Left := 180;
+    Rect.Width := middle;
+  end;
+
 end;
 
 function TFormWindow.isWritable(filename: string): Boolean;
@@ -663,6 +692,8 @@ procedure TFormWindow.FormMouseDown(Sender: TObject; Button: TMouseButton;
 var
   _formPosition: TPoint;
 begin
+  deltaLeft := 0;
+
   mouseDown := Point(X, Y);
  if ssAlt in Shift then Exit;
 
@@ -674,8 +705,8 @@ begin
   end;
 
   if Button = mbLeft then begin
-    // Form do not change position
     if(_formPosition = Point(Left, Top)) then begin
+      // Form do not change position
       SetForegroundWindow(gameHandle);
     end;
   end
@@ -696,6 +727,8 @@ begin
   x2 := Max(mouseDown.X, X);
   y1 := Min(mouseDown.Y, Y);
   y2 := Max(mouseDown.Y, Y);
+
+  if (Abs(x1 - x2) < 20) or (Abs(y1 - y2) < 20) then Exit;
 
   _gameX := (x1 * gameXend - x1 * gameX + Width * gameX) / Width;
   _gameY := (y1 * gameYend - y1 * gameY + Height * gameY) / Height;
