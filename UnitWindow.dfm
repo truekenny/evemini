@@ -2,10 +2,9 @@ object FormWindow: TFormWindow
   Left = 0
   Top = 0
   AlphaBlendValue = 170
-  BorderStyle = bsSingle
   Caption = 'Window'
-  ClientHeight = 221
-  ClientWidth = 394
+  ClientHeight = 211
+  ClientWidth = 384
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -25,13 +24,13 @@ object FormWindow: TFormWindow
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    394
-    221)
+    384
+    211)
   PixelsPerInch = 96
   TextHeight = 13
   object labelBuild: TLabel
-    Left = 351
-    Top = 197
+    Left = 341
+    Top = 187
     Width = 35
     Height = 12
     Alignment = taRightJustify
@@ -69,14 +68,14 @@ object FormWindow: TFormWindow
     Enabled = False
     Interval = 50
     OnTimer = TimerTimer
-    Left = 40
-    Top = 136
+    Left = 88
+    Top = 128
   end
   object PopupActionBar: TPopupActionBar
     Images = imageList
     OnPopup = PopupActionBarPopup
-    Left = 40
-    Top = 88
+    Left = 88
+    Top = 80
     object menuSelectTarget: TMenuItem
       Caption = 'Select Target'
       ImageIndex = 0
@@ -161,8 +160,8 @@ object FormWindow: TFormWindow
   end
   object imageList: TImageList
     ColorDepth = cd32Bit
-    Left = 40
-    Top = 40
+    Left = 88
+    Top = 32
     Bitmap = {
       494C010105000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
