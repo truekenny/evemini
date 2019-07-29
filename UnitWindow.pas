@@ -62,7 +62,6 @@ type
     procedure FormDblClick(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure PopupActionBarPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
     procedure menuCloseClick(Sender: TObject);
@@ -70,13 +69,16 @@ type
     procedure menuResizeWindow1x1Click(Sender: TObject);
     procedure menuWindowHalfOpacityClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure WMSizing(var Message: TMessage); message WM_SIZING;
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure menuAllTargetSpaceClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure menuNewClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+
+    procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
+    procedure WMSizing(var Message: TMessage); message WM_SIZING;
+    procedure WMMoving(var Message: TMessage); message WM_MOVING;
   private
     { Private declarations }
     windowIndex: Integer;
@@ -134,26 +136,41 @@ end;
 // Save proportion on resize form
 procedure TFormWindow.WMSizing(var Message: TMessage);
 var
+  Rect: ^TRect;
   aspectRatio: double;
 begin
   if not menuWindowProportion.Checked then Exit;
 
   aspectRatio := gameWidth / gameHeight;
+  Rect := Pointer(Message.LParam);
 
   case Message.wParam of
     WMSZ_LEFT, WMSZ_RIGHT, WMSZ_BOTTOMLEFT:
-      with PRect(Message.LParam)^ do
-        Bottom := Top + Round((Right-Left)/aspectRatio);
+      Rect.Bottom := Rect.Top + Round((Rect.Right - Rect.Left)/aspectRatio);
     WMSZ_TOP, WMSZ_BOTTOM, WMSZ_TOPRIGHT, WMSZ_BOTTOMRIGHT:
-      with PRect(Message.LParam)^ do
-        Right := Left + Round((Bottom-Top)*aspectRatio);
+      Rect.Right := Rect.Left + Round((Rect.Bottom - Rect.Top)*aspectRatio);
     WMSZ_TOPLEFT:
-      with PRect(Message.LParam)^ do
-        Top := Bottom - Round((Right-Left)/aspectRatio);
+      Rect.Top := Rect.Bottom - Round((Rect.Right - Rect.Left)/aspectRatio);
   end;
   inherited;
 
   borderThumbnail(gameHandle = GetForegroundWindow);
+end;
+
+procedure TFormWindow.WMMoving(var Message: TMessage);
+var
+  Rect: ^TRect;
+  middle: Integer;
+begin
+  Rect:= Pointer(Message.LParam);
+
+  Exit;
+
+  if Rect.Left < 5 then begin
+    middle := Rect.Width;
+    Rect.Left := 0;
+    Rect.Width := middle;
+  end;
 end;
 
 function TFormWindow.isWritable(filename: string): Boolean;
