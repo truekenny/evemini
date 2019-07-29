@@ -138,13 +138,14 @@ object FormWindow: TFormWindow
       Caption = 'Window Proportion'
       Checked = True
     end
-    object menuWindowHalfOpacity: TMenuItem
-      Caption = 'Window Half Opacity'
-      OnClick = menuWindowHalfOpacityClick
-    end
     object menuWindowStick: TMenuItem
       AutoCheck = True
       Caption = 'Window Stick'
+      Checked = True
+    end
+    object menuWindowHalfOpacity: TMenuItem
+      Caption = 'Window Half Opacity'
+      OnClick = menuWindowHalfOpacityClick
     end
     object menuInvertWheel: TMenuItem
       AutoCheck = True

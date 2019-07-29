@@ -450,6 +450,7 @@ begin
     ini.WriteBool('check', 'always-visible', menuAlwaysVisible.Checked);
     ini.WriteBool('check', 'window-proportion', menuWindowProportion.Checked);
     ini.WriteBool('check', 'invert-wheel', menuInvertWheel.Checked);
+    ini.WriteBool('check', 'window-stick', menuWindowStick.Checked);
   finally
     ini.Free;
   end;
@@ -499,6 +500,7 @@ begin
         menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
         menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
         menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
+        menuWindowStick.Checked := ini.ReadBool('check', 'window-stick', menuWindowStick.Checked);
         menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
       finally
         ini.Free;
@@ -541,6 +543,7 @@ begin
     else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
+    else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
     else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
   end;
