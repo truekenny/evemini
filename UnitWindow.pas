@@ -224,12 +224,10 @@ end;
 procedure TFormWindow.registerThumbnail();
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
-  ProgmanHandle: THandle;
 begin
-  ProgmanHandle := gameHandle;
-  if ProgmanHandle>0 then
+  if gameHandle <> 0 then
     begin
-      if Succeeded(DwmRegisterThumbnail(Handle,ProgmanHandle,@PH))then
+      if Succeeded(DwmRegisterThumbnail(Handle, gameHandle, @PH))then
          begin
            Props.dwFlags := DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
                             DWM_TNP_OPACITY;
@@ -238,7 +236,7 @@ begin
            Props.fVisible := true;
            Props.opacity := 255;
 
-           if Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
+           if Succeeded(DwmUpdateThumbnailProperties(PH, Props))then begin
              Color := clLime;
            end else begin
               Timer.Enabled := False;
