@@ -97,7 +97,8 @@ type
     mouseDown: TPoint;
 
     // Перемещение формы, WMMoving, MouseUp
-    deltaLeft: Integer;
+    glueDeltaLeft: Integer;
+    glueDeltaTop: Integer;
 
     function getHandle(): Cardinal;
     procedure fresh();
@@ -162,44 +163,119 @@ begin
 end;
 
 procedure TFormWindow.WMMoving(var Message: TMessage);
+const
+  DELTA = 10;
 var
   Rect: ^TRect;
+
+  checkingBorder,
+  index,
   middle: Integer;
 
+  leftBorders,
+  topBorders: array of Integer;
+
+  isGotLeft,
+  isGotTop: Boolean;
 begin
+  isGotLeft := False;
+  isGotTop := False;
+
   Rect:= Pointer(Message.LParam);
 
+  // Границы дисплея
+  SetLength(leftBorders, 2);
+  leftBorders[Length(leftBorders) - 2] := 0;
+  leftBorders[Length(leftBorders) - 1] := Screen.Width - Width;
+
+  // Границы дисплея
+  SetLength(topBorders, 2);
+  topBorders[Length(topBorders) - 2] := 0;
+  topBorders[Length(topBorders) - 1] := Screen.Height - Height;
+
+  // Выбираю граничные значения для Left и Top
+  for index := 0 to Length(FormWindow) - 1 do begin
+    if index = windowIndex then Continue;
+    if FormWindow[index] = nil then Continue;
+
+    SetLength(leftBorders, Length(leftBorders) + 4);
+    leftBorders[Length(leftBorders) - 4] := FormWindow[index].Left - Width;
+    leftBorders[Length(leftBorders) - 3] := FormWindow[index].Left + FormWindow[index].Width - Width;
+    leftBorders[Length(leftBorders) - 2] := FormWindow[index].Left;
+    leftBorders[Length(leftBorders) - 1] := FormWindow[index].Left + FormWindow[index].Width;
+
+    SetLength(topBorders, Length(topBorders) + 4);
+    topBorders[Length(topBorders) - 4] := FormWindow[index].Top - Height;
+    topBorders[Length(topBorders) - 3] := FormWindow[index].Top + FormWindow[index].Height - Height;
+    topBorders[Length(topBorders) - 2] := FormWindow[index].Top;
+    topBorders[Length(topBorders) - 1] := FormWindow[index].Top + FormWindow[index].Height;
+  end;
 
 
-  Exit;
+  for index := 0 to Length(leftBorders) - 1 do begin
+    // Проверяю левую границу, устанавливаю новое значение Left
+    checkingBorder := leftBorders[index];
+    if (Rect.Left > checkingBorder - DELTA) and (Rect.Left < checkingBorder + DELTA) and (not isGotLeft) then begin
+      glueDeltaLeft := glueDeltaLeft + Rect.Left - Left;
 
+      middle := Rect.Width;
+      Rect.Left := checkingBorder;
+      Rect.Width := middle;
 
+      isGotLeft := True;
+    end;
 
+    // Проверяю верхнюю границу, устанавливаю новое значение Top
+    checkingBorder := topBorders[index];
+    if (Rect.Top > checkingBorder - DELTA) and (Rect.Top < checkingBorder + DELTA) and (not isGotTop) then begin
+      glueDeltaTop := glueDeltaTop + Rect.Top - Top;
 
-  if (Rect.Left > 180) and (Rect.Left < 220) then begin
-    deltaLeft := deltaLeft + Rect.Left - Left;
+      middle := Rect.Height;
+      Rect.Top := checkingBorder;
+      Rect.Height := middle;
+
+      isGotTop := True;
+    end;
+  end;
+
+  // Проверяю не вышел ли курсор за правый предел glue_DELTA границы
+  if glueDeltaLeft >= DELTA then begin
+    glueDeltaLeft := 0;
 
     middle := Rect.Width;
-    Rect.Left := 200;
+    Rect.Left := Rect.Left + DELTA;
     Rect.Width := middle;
   end;
 
-  if deltaLeft >= 20 then begin
-    deltaLeft := 0;
+  // Проверяю не вышел ли курсор за левый предел glue_DELTA границы
+  if glueDeltaLeft <= -DELTA then begin
+    glueDeltaLeft := 0;
 
     middle := Rect.Width;
-    Rect.Left := 220;
+    Rect.Left := Rect.Left - DELTA;
     Rect.Width := middle;
   end;
 
-  if deltaLeft <= -20 then begin
-    deltaLeft := 0;
+  // Проверяю не вышел ли курсор за нижний предел glue_DELTA границы
+  if glueDeltaTop >= DELTA then begin
+    glueDeltaTop := 0;
 
-    middle := Rect.Width;
-    Rect.Left := 180;
-    Rect.Width := middle;
+    middle := Rect.Height;
+    Rect.Top := Rect.Top + DELTA;
+    Rect.Height := middle;
   end;
 
+  // Проверяю не вышел ли курсор за верхний предел glue_DELTA границы
+  if glueDeltaTop <= -DELTA then begin
+    glueDeltaTop := 0;
+
+    middle := Rect.Height;
+    Rect.Top := Rect.Top - DELTA;
+    Rect.Height := middle;
+  end;
+
+  leftBorders := nil;
+  topBorders := nil;
 end;
 
 function TFormWindow.isWritable(filename: string): Boolean;
@@ -692,7 +768,8 @@ procedure TFormWindow.FormMouseDown(Sender: TObject; Button: TMouseButton;
 var
   _formPosition: TPoint;
 begin
-  deltaLeft := 0;
+  glueDeltaLeft := 0;
+  glueDeltaTop := 0;
 
   mouseDown := Point(X, Y);
  if ssAlt in Shift then Exit;
