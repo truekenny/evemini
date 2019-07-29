@@ -14,6 +14,7 @@ uses
   UnitProcessLibrary,
   UnitString,
   Vcl.ActnPopup,
+  Vcl.ComCtrls,
   Vcl.Controls,
   Vcl.Dialogs,
   Vcl.ExtCtrls,
@@ -75,6 +76,7 @@ type
     procedure menuAllTargetSpaceClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure menuNewClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -601,6 +603,42 @@ begin
   end else begin
     WindowState := wsMaximized;
   end;
+
+  borderThumbnail(gameHandle = GetForegroundWindow);
+end;
+
+procedure TFormWindow.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if not (ssAlt in Shift) then Exit;
+
+  if not menuWindowSizable.Checked then Exit;
+
+  case Key of
+    Ord('1'): begin
+      Width := Round(gameWidth / 2);
+      Height := Round(gameHeight / 2);
+    end;
+    Ord('2'): begin
+      Width := gameWidth;
+      Height := gameHeight;
+    end;
+    Ord('3'): begin
+      Width := gameWidth * 2;
+      Height := gameHeight * 2;
+    end;
+    Ord('4'): begin
+      Width := gameWidth * 3;
+      Height := gameHeight * 3;
+    end;
+  end;
+
+  saveProportion;
+
+  borderThumbnail(gameHandle = GetForegroundWindow);
+
+  if (Left < 0) or (Left > Screen.Width) then Left := 0;
+  if (Top < 0) or (Top > Screen.Height) then Top := 0;
 end;
 
 procedure TFormWindow.FormMouseDown(Sender: TObject; Button: TMouseButton;

@@ -79,7 +79,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_Keys>CompanyName=Truekenny;FileDescription=Evemini Debug Version;FileVersion=1.1.0.0;InternalName=Evemini;LegalCopyright=;LegalTrademarks=;OriginalFilename=Evemini.exe;ProductName=Evemini;ProductVersion=0.7;Comments=https://github.com/truekenny/evemini;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_MinorVer>1</VerInfo_MinorVer>
-        <Debugger_RunParams>--window-name=&quot;Calculator&quot; --form-top=400 --form-left=400 --window-sizable=false --always-visible=true</Debugger_RunParams>
+        <Debugger_RunParams>--window-name=&quot;Calculator&quot; --form-top=400 --form-left=400 --always-visible=true</Debugger_RunParams>
         <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>

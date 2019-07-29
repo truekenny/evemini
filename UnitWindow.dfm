@@ -18,6 +18,7 @@ object FormWindow: TFormWindow
   OnActivate = FormActivate
   OnClose = FormClose
   OnDblClick = FormDblClick
+  OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
