@@ -69,14 +69,14 @@ object FormWindow: TFormWindow
     Enabled = False
     Interval = 50
     OnTimer = TimerTimer
-    Left = 8
+    Left = 40
     Top = 136
   end
   object PopupActionBar: TPopupActionBar
     Images = imageList
     OnPopup = PopupActionBarPopup
-    Left = 48
-    Top = 136
+    Left = 40
+    Top = 88
     object menuSelectTarget: TMenuItem
       Caption = 'Select Target'
       ImageIndex = 0
@@ -142,6 +142,10 @@ object FormWindow: TFormWindow
       Caption = 'Window Half Opacity'
       OnClick = menuWindowHalfOpacityClick
     end
+    object menuWindowStick: TMenuItem
+      AutoCheck = True
+      Caption = 'Window Stick'
+    end
     object menuInvertWheel: TMenuItem
       AutoCheck = True
       Caption = 'Invert Wheel'
@@ -156,8 +160,8 @@ object FormWindow: TFormWindow
   end
   object imageList: TImageList
     ColorDepth = cd32Bit
-    Left = 88
-    Top = 136
+    Left = 40
+    Top = 40
     Bitmap = {
       494C010105000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020

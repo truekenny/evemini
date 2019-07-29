@@ -54,6 +54,7 @@ type
     labelHelp: TLabel;
     menuNew: TMenuItem;
     menuSeparatorNew: TMenuItem;
+    menuWindowStick: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -165,21 +166,20 @@ end;
 procedure TFormWindow.WMMoving(var Message: TMessage);
 const
   DELTA = 10;
+  BREAK_NEAR = -10000;
 var
   Rect: ^TRect;
 
+  nearCheckingBorderLeft,
+  nearCheckingBorderTop,
   checkingBorder,
   index,
   middle: Integer;
 
   leftBorders,
   topBorders: array of Integer;
-
-  isGotLeft,
-  isGotTop: Boolean;
 begin
-  isGotLeft := False;
-  isGotTop := False;
+  if not menuWindowStick.Checked then Exit;
 
   Rect:= Pointer(Message.LParam);
 
@@ -212,30 +212,40 @@ begin
   end;
 
 
+  nearCheckingBorderLeft := BREAK_NEAR;
+  nearCheckingBorderTop := BREAK_NEAR;
   for index := 0 to Length(leftBorders) - 1 do begin
     // Проверяю левую границу, устанавливаю новое значение Left
     checkingBorder := leftBorders[index];
-    if (Rect.Left > checkingBorder - DELTA) and (Rect.Left < checkingBorder + DELTA) and (not isGotLeft) then begin
-      glueDeltaLeft := glueDeltaLeft + Rect.Left - Left;
-
-      middle := Rect.Width;
-      Rect.Left := checkingBorder;
-      Rect.Width := middle;
-
-      isGotLeft := True;
+    if (Rect.Left > checkingBorder - DELTA) and (Rect.Left < checkingBorder + DELTA) then begin
+      // Ищу наиболее подходящее значение
+      if Abs(nearCheckingBorderLeft - Rect.Left) > Abs(checkingBorder - Rect.Left) then
+        nearCheckingBorderLeft := checkingBorder;
     end;
 
     // Проверяю верхнюю границу, устанавливаю новое значение Top
     checkingBorder := topBorders[index];
-    if (Rect.Top > checkingBorder - DELTA) and (Rect.Top < checkingBorder + DELTA) and (not isGotTop) then begin
+    if (Rect.Top > checkingBorder - DELTA) and (Rect.Top < checkingBorder + DELTA) then begin
+      // Ищу наиболее подходящее значение
+      if Abs(nearCheckingBorderTop - Rect.Top) > Abs(checkingBorder - Rect.Top) then
+        nearCheckingBorderTop := checkingBorder;
+    end;
+  end;
+
+  if nearCheckingBorderLeft <> BREAK_NEAR then begin
+      glueDeltaLeft := glueDeltaLeft + Rect.Left - Left;
+
+      middle := Rect.Width;
+      Rect.Left := nearCheckingBorderLeft;
+      Rect.Width := middle;
+  end;
+
+  if nearCheckingBorderTop <> BREAK_NEAR then begin
       glueDeltaTop := glueDeltaTop + Rect.Top - Top;
 
       middle := Rect.Height;
-      Rect.Top := checkingBorder;
+      Rect.Top := nearCheckingBorderTop;
       Rect.Height := middle;
-
-      isGotTop := True;
-    end;
   end;
 
   // Проверяю не вышел ли курсор за правый предел glue_DELTA границы
