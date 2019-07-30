@@ -3,12 +3,14 @@ program Evemini;
 uses
   Vcl.Forms,
   Winapi.Windows,
-  UnitWindow in 'UnitWindow.pas' {FormWindow},
-  UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
+
+  AppTrackMenus in 'AppTrackMenus.pas',
   UnitGetBuild in 'UnitGetBuild.pas',
+  UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitInlineMacros in 'UnitInlineMacros.pas',
   UnitProcessLibrary in 'UnitProcessLibrary.pas',
-  UnitString in 'UnitString.pas';
+  UnitString in 'UnitString.pas',
+  UnitWindow in 'UnitWindow.pas' {FormWindow};
 
 const
   WM_COPYDATA = 74;

@@ -3,6 +3,7 @@ unit UnitWindow;
 interface
 
 uses
+  AppTrackMenus,
   System.Classes,
   System.ImageList,
   System.IniFiles,
@@ -32,7 +33,7 @@ uses
 type
   TFormWindow = class(TForm)
     Timer: TTimer;
-    PopupActionBar: TPopupActionBar;
+    PopupMenu: AppTrackMenus.TPopupMenu;
     menuSelectTarget: TMenuItem;
     menuDefault: TMenuItem;
     N11: TMenuItem;
@@ -63,7 +64,7 @@ type
     procedure FormDblClick(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure PopupActionBarPopup(Sender: TObject);
+    procedure PopupMenuPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
     procedure menuCloseClick(Sender: TObject);
     procedure menuSelectTargetRegionClick(Sender: TObject);
@@ -80,6 +81,7 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
     procedure WMSizing(var Message: TMessage); message WM_SIZING;
     procedure WMMoving(var Message: TMessage); message WM_MOVING;
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -108,6 +110,8 @@ type
     procedure generateConfigFilename();
     function isWritable(filename: string): Boolean;
     procedure saveProportion();
+
+    procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
@@ -123,6 +127,11 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TFormWindow.TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
+begin
+  CanClose := not Item.AutoCheck;
+end;
 
 // Always On Top
 procedure TFormWindow.CreateParams(var Params: TCreateParams);
@@ -145,7 +154,10 @@ var
   Rect: ^TRect;
   aspectRatio: double;
 begin
-  if not menuWindowProportion.Checked then Exit;
+  if not menuWindowProportion.Checked then begin
+    borderThumbnail(gameHandle = GetForegroundWindow);
+    Exit;
+  end;
 
   aspectRatio := gameWidth / gameHeight;
   Rect := Pointer(Message.LParam);
@@ -458,6 +470,12 @@ begin
 
 end;
 
+procedure TFormWindow.FormCreate(Sender: TObject);
+begin
+  PopupMenu.TrackMenu := True;
+  PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
+end;
+
 procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
 var
   index: Integer;
@@ -715,7 +733,7 @@ begin
   Result := True;
 end;
 
-procedure TFormWindow.PopupActionBarPopup(Sender: TObject);
+procedure TFormWindow.PopupMenuPopup(Sender: TObject);
 var
   index : Integer;
 begin

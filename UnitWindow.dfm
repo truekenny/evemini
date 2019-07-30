@@ -13,9 +13,10 @@ object FormWindow: TFormWindow
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
-  PopupMenu = PopupActionBar
+  PopupMenu = PopupMenu
   OnActivate = FormActivate
   OnClose = FormClose
+  OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
@@ -71,9 +72,9 @@ object FormWindow: TFormWindow
     Left = 88
     Top = 128
   end
-  object PopupActionBar: TPopupActionBar
+  object PopupMenu: TPopupMenu
     Images = imageList
-    OnPopup = PopupActionBarPopup
+    OnPopup = PopupMenuPopup
     Left = 88
     Top = 80
     object menuSelectTarget: TMenuItem

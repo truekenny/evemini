@@ -109,16 +109,17 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UnitWindow.pas">
-            <Form>FormWindow</Form>
-        </DCCReference>
+        <DCCReference Include="AppTrackMenus.pas"/>
+        <DCCReference Include="UnitGetBuild.pas"/>
         <DCCReference Include="UnitEvemini.pas">
             <Form>FormEvemini</Form>
         </DCCReference>
-        <DCCReference Include="UnitGetBuild.pas"/>
         <DCCReference Include="UnitInlineMacros.pas"/>
         <DCCReference Include="UnitProcessLibrary.pas"/>
         <DCCReference Include="UnitString.pas"/>
+        <DCCReference Include="UnitWindow.pas">
+            <Form>FormWindow</Form>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
