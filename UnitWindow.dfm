@@ -143,6 +143,7 @@ object FormWindow: TFormWindow
       Checked = True
     end
     object menuWindowHalfOpacity: TMenuItem
+      AutoCheck = True
       Caption = 'Window Half Opacity'
       OnClick = menuWindowHalfOpacityClick
     end

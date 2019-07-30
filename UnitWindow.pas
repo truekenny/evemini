@@ -197,6 +197,7 @@ begin
   for index := 0 to Length(FormWindow) - 1 do begin
     if index = windowIndex then Continue;
     if FormWindow[index] = nil then Continue;
+    if not FormWindow[index].Visible then Continue;
 
     SetLength(leftBorders, Length(leftBorders) + 4);
     leftBorders[Length(leftBorders) - 4] := FormWindow[index].Left - Width;
@@ -634,7 +635,6 @@ end;
 
 procedure TFormWindow.menuWindowHalfOpacityClick(Sender: TObject);
 begin
-  menuWindowHalfOpacity.Checked := not menuWindowHalfOpacity.Checked;
   AlphaBlend := menuWindowHalfOpacity.Checked;
 end;
 
