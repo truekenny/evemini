@@ -93,6 +93,22 @@ object FormWindow: TFormWindow
         Caption = '2'
       end
     end
+    object menuRegions: TMenuItem
+      Caption = 'Regions'
+      object menuSelectRegion: TMenuItem
+        Caption = 'Select Region'
+        Enabled = False
+        Visible = False
+        OnClick = menuSelectRegionClick
+      end
+      object menuSeparatorSaveCurrent: TMenuItem
+        Caption = '-'
+      end
+      object menuSaveCurrentRegion: TMenuItem
+        Caption = 'Save Current...'
+        OnClick = menuSaveCurrentRegionClick
+      end
+    end
     object menuSelectTargetRegion: TMenuItem
       Caption = 'Select Target Region'
       ImageIndex = 1

@@ -31,6 +31,19 @@ uses
   Winapi.Windows;
 
 type
+  TMenuItemRegion = class(TMenuItem)
+  private
+    FGameWidth: Integer;
+    FGameHeight: Integer;
+    FGameLeft: Integer;
+    FGameTop: Integer;
+  public
+    property gameWidth: Integer read FGameWidth write FGameWidth;
+    property gameHeight: Integer read FGameHeight write FGameHeight;
+    property gameLeft: Integer read FGameLeft write FGameLeft;
+    property gameTop: Integer read FGameTop write FGameTop;
+  end;
+
   TFormWindow = class(TForm)
     Timer: TTimer;
     PopupMenu: AppTrackMenus.TPopupMenu;
@@ -56,6 +69,10 @@ type
     menuNew: TMenuItem;
     menuSeparatorNew: TMenuItem;
     menuWindowStick: TMenuItem;
+    menuRegions: TMenuItem;
+    menuSaveCurrentRegion: TMenuItem;
+    menuSeparatorSaveCurrent: TMenuItem;
+    menuSelectRegion: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -82,6 +99,8 @@ type
     procedure WMSizing(var Message: TMessage); message WM_SIZING;
     procedure WMMoving(var Message: TMessage); message WM_MOVING;
     procedure FormCreate(Sender: TObject);
+    procedure menuSaveCurrentRegionClick(Sender: TObject);
+    procedure menuSelectRegionClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -400,6 +419,34 @@ begin
     end;
 end;
 
+procedure TFormWindow.menuSaveCurrentRegionClick(Sender: TObject);
+const
+  NO_DATA = '';
+var
+  config: string;
+  ini: TIniFile;
+  count: Integer;
+  name: string;
+begin
+  name := InputBox(Application.Title, 'Region name', NO_DATA);
+  if name = NO_DATA then Exit;
+
+  config := ExtractFilePath(ParamStr(0)) + 'regions.ini';
+  ini := TIniFile.Create(config);
+  try
+    count := ini.ReadInteger('options', 'count', 0) + 1;
+
+    ini.WriteInteger('options', 'count', count);
+    ini.WriteString('region_' + IntToStr(count), 'name', name);
+    ini.WriteInteger('region_' + IntToStr(count), 'gameWidth', gameWidth);
+    ini.WriteInteger('region_' + IntToStr(count), 'gameHeight', gameHeight);
+    ini.WriteInteger('region_' + IntToStr(count), 'gameLeft', gameX);
+    ini.WriteInteger('region_' + IntToStr(count), 'gameTop', gameY);
+  finally
+    ini.Free;
+  end;
+end;
+
 procedure TFormWindow.borderThumbnail(withBorder: Boolean);
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
@@ -638,6 +685,19 @@ begin
   Close();
 end;
 
+procedure TFormWindow.menuSelectRegionClick(Sender: TObject);
+begin
+  gameWidth := (Sender as TMenuItemRegion).gameWidth;
+  gameHeight := (Sender as TMenuItemRegion).gameHeight;
+  gameX :=  (Sender as TMenuItemRegion).gameLeft;
+  gameY :=  (Sender as TMenuItemRegion).gameTop;
+
+  Width := gameWidth;
+  Height := gameHeight;
+
+  // borderThumbnail(gameHandle = GetForegroundWindow);
+end;
+
 procedure TFormWindow.menuSelectTargetRegionClick(Sender: TObject);
 var
   rect: TRect;
@@ -734,19 +794,65 @@ begin
 end;
 
 procedure TFormWindow.PopupMenuPopup(Sender: TObject);
+const
+  NO_DATA = -1;
 var
   index : Integer;
-begin
-  // Удаляем всё
-  for index := 1 to menuSelectTarget.Count - 1 do begin
-    menuSelectTarget.Delete(1);
-  end;
 
-  //imageList.Clear;
+  config: string;
+  ini: TIniFile;
+  count, countInserted: Integer;
+  _gameWidth, _gameHeight, _gameLeft, _gameTop: Integer;
+  menuItem: TMenuItemRegion;
+begin
+  // Удаляем все окна
+  for index := 1 to menuSelectTarget.Count - 1 do
+    menuSelectTarget.Delete(1);
+
+  // Удаляем картинки окон
   for index := 5 to imageList.Count - 1 do
     imageList.Delete(5);
 
+  // Загружаем новые окна
   EnumWindows(@EnumWindowsProc, windowIndex);
+
+
+
+  // Удаляем регионы
+  for index := 1 to menuRegions.Count - 3 do
+    menuRegions.Delete(1);
+
+  // Добавляем регионы
+  countInserted := 0;
+  config := ExtractFilePath(ParamStr(0)) + 'regions.ini';
+  ini := TIniFile.Create(config);
+  try
+    count := ini.ReadInteger('options', 'count', 0);
+
+    for index := 1 to count do begin
+      _gameWidth := ini.ReadInteger('region_' + IntToStr(index), 'gameWidth', NO_DATA);
+      _gameHeight := ini.ReadInteger('region_' + IntToStr(index), 'gameHeight', NO_DATA);
+      _gameLeft := ini.ReadInteger('region_' + IntToStr(index), 'gameLeft', NO_DATA);
+      _gameTop := ini.ReadInteger('region_' + IntToStr(index), 'gameTop', NO_DATA);
+
+      if (_gameWidth = NO_DATA) or (_gameHeight = NO_DATA)
+      or (_gameLeft = NO_DATA) or (_gameTop = NO_DATA) then Continue;
+
+      Inc(countInserted);
+
+      menuItem := TMenuItemRegion.Create(menuRegions);
+      menuItem.gameWidth := _gameWidth;
+      menuItem.gameHeight := _gameHeight;
+      menuItem.gameLeft := _gameLeft;
+      menuItem.gameTop := _gameTop;
+      menuItem.Caption := ini.ReadString('region_' + IntToStr(index), 'name', 'NO_DATA');
+      menuItem.OnClick :=  menuSelectRegionClick;
+      menuRegions.Insert(countInserted, menuItem);
+    end;
+  finally
+    ini.Free;
+  end;
+
 end;
 
 procedure TFormWindow.FormDblClick(Sender: TObject);
