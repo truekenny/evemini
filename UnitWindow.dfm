@@ -132,6 +132,10 @@ object FormWindow: TFormWindow
       ImageIndex = 4
       OnClick = menuNewClick
     end
+    object menuSetWindowName: TMenuItem
+      Caption = 'Set Window Name...'
+      OnClick = menuSetWindowNameClick
+    end
     object menuSeparatorChecks: TMenuItem
       Caption = '-'
     end

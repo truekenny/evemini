@@ -73,6 +73,7 @@ type
     menuSaveCurrentRegion: TMenuItem;
     menuSeparatorSaveCurrent: TMenuItem;
     menuSelectRegion: TMenuItem;
+    menuSetWindowName: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -101,6 +102,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure menuSaveCurrentRegionClick(Sender: TObject);
     procedure menuSelectRegionClick(Sender: TObject);
+    procedure menuSetWindowNameClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -121,6 +123,8 @@ type
     // Перемещение формы, WMMoving, MouseUp
     glueDeltaLeft: Integer;
     glueDeltaTop: Integer;
+
+    getHandlerResult: Cardinal;
 
     function getHandle(): Cardinal;
     procedure fresh();
@@ -345,9 +349,50 @@ begin
   config := ExtractFilePath(ParamStr(0)) + config + '.ini';
 end;
 
+// Global
+function SearchMaskEnumWindowsProc(hWindow: HWND; _windowIndex:Cardinal): Bool; stdcall;
+var
+  titleLength: Integer;
+  titleChars: PChar;
+  title, subWindowName: String;
+  windowStyle: Longint;
+  visibleWindow: LongInt;
+begin
+  Result := True;
+
+  GetMem(titleChars, 256);
+
+  windowStyle := GetWindowLong(hWindow, GWL_STYLE);
+  visibleWindow := windowStyle and Longint(WS_VISIBLE);
+
+  titleLength := GetWindowText(hWindow, titleChars, 255);
+  title := titleChars;
+  subWindowName := Copy(FormWindow[_windowIndex].windowName, 2);
+
+  if (titleLength > 0)
+    and (Pos('Evemini', title) = 0)
+    and (visibleWindow > 0)
+    and (Pos(subWindowName ,title) <> 0)
+    then begin
+      Result := False;
+      FormWindow[_windowIndex].getHandlerResult := hWindow;
+    end;
+
+  FreeMem(titleChars, 256);
+end;
+
+
 function TFormWindow.getHandle(): Cardinal;
 begin
-  Result := FindWindow(nil, PChar(windowName));
+  if (Length(windowName) > 0) and (windowName[1] = '*') then begin
+    getHandlerResult := 0;
+
+    EnumWindows(@SearchMaskEnumWindowsProc, windowIndex);
+
+    Result := getHandlerResult;
+  end
+  else
+    Result := FindWindow(nil, PChar(windowName));
 end;
 
 procedure TFormWindow.TimerTimer(Sender: TObject);
@@ -547,7 +592,7 @@ begin
     if FileExists(param) then begin
       config := param;
 
-      ini := TIniFile.Create(param);
+      ini := TIniFile.Create(config);
       try
         windowName := ini.ReadString('game', 'name', windowName);
         Timer.Enabled := True;
@@ -709,6 +754,17 @@ begin
 
   gameWidth := Width;
   gameHeight := Height;
+end;
+
+procedure TFormWindow.menuSetWindowNameClick(Sender: TObject);
+begin
+  windowName := InputBox(Application.Title, 'Window Name', windowName);
+
+  if Length(windowName) > 0 then begin
+    Caption := 'Evemini - ' + windowName;
+    Timer.Enabled := true;
+    generateConfigFilename;
+  end;
 end;
 
 procedure TFormWindow.menuWindowHalfOpacityClick(Sender: TObject);
