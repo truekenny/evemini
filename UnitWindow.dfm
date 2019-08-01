@@ -128,13 +128,17 @@ object FormWindow: TFormWindow
       Caption = '-'
     end
     object menuNew: TMenuItem
-      Caption = 'New...'
+      Caption = 'New'
       ImageIndex = 4
       OnClick = menuNewClick
     end
     object menuSetWindowName: TMenuItem
       Caption = 'Set Window Name...'
       OnClick = menuSetWindowNameClick
+    end
+    object menuSearchWindowAgain: TMenuItem
+      Caption = 'Search Window Again'
+      OnClick = menuSearchWindowAgainClick
     end
     object menuSeparatorChecks: TMenuItem
       Caption = '-'

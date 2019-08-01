@@ -74,6 +74,7 @@ type
     menuSeparatorSaveCurrent: TMenuItem;
     menuSelectRegion: TMenuItem;
     menuSetWindowName: TMenuItem;
+    menuSearchWindowAgain: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -103,6 +104,7 @@ type
     procedure menuSaveCurrentRegionClick(Sender: TObject);
     procedure menuSelectRegionClick(Sender: TObject);
     procedure menuSetWindowNameClick(Sender: TObject);
+    procedure menuSearchWindowAgainClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -738,6 +740,20 @@ end;
 procedure TFormWindow.menuCloseClick(Sender: TObject);
 begin
   Close();
+end;
+
+procedure TFormWindow.menuSearchWindowAgainClick(Sender: TObject);
+var
+  _gameHandler: Cardinal;
+begin
+  _gameHandler := getHandle;
+
+  if _gameHandler <> 0 then begin
+    DwmUnregisterThumbnail(PH);
+    gameHandle := (Sender as TMenuItem).Tag;
+    registerThumbnail;
+  end;
+
 end;
 
 procedure TFormWindow.menuSelectRegionClick(Sender: TObject);

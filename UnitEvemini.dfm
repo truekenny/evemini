@@ -33,7 +33,7 @@ object FormEvemini: TFormEvemini
       end
     end
     object New1: TMenuItem
-      Caption = 'New...'
+      Caption = 'New'
       ImageIndex = 4
       OnClick = New1Click
     end
