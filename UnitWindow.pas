@@ -107,7 +107,7 @@ type
     { Private declarations }
     windowIndex: Integer;
 
-    windowName: string;
+    fWindowName: string;
     gameX: Integer;
     gameY: Integer;
     gameWidth: Integer;
@@ -133,13 +133,14 @@ type
     procedure generateConfigFilename();
     function isWritable(filename: string): Boolean;
     procedure saveProportion();
+    procedure setWindowName(str: string);
 
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
 
-    property _windowName:string read windowName;
+    property windowName:string read fWindowName write setWindowName;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
 end;
@@ -150,6 +151,22 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TFormWindow.setWindowName(str: string);
+begin
+  fWindowName := str;
+
+  if fWindowName = '' then begin
+    Timer.Enabled := False;
+    config := '';
+    Caption := 'Evemini';
+  end
+  else begin
+    Timer.Enabled := True;
+    generateConfigFilename;
+    Caption := 'Evemini - ' + fWindowName;
+  end;
+end;
 
 procedure TFormWindow.TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
 begin
@@ -571,10 +588,11 @@ end;
 procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
 var
   index: Integer;
-  param, key, value: string;
+  param, key, value, _config: string;
   pair: array of string;
 
   ini: TIniFile;
+  _windowName: string;
 begin
   BorderStyle := bsNone;
 
@@ -590,12 +608,11 @@ begin
     param := params[index];
 
     if FileExists(param) then begin
-      config := param;
+      _config := param;
 
-      ini := TIniFile.Create(config);
+      ini := TIniFile.Create(_config);
       try
-        windowName := ini.ReadString('game', 'name', windowName);
-        Timer.Enabled := True;
+        _windowName := ini.ReadString('game', 'name', windowName);
 
         gameX := ini.ReadInteger('game', 'left', gameX);
         gameY := ini.ReadInteger('game', 'top', gameY);
@@ -630,14 +647,10 @@ begin
     // --name="Elle Tan" --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=10 --game-y=10 --always-visible=true
 
     if key = '--capsuleer-name' then begin
-      windowName := 'EVE - ' + value;
-      Timer.Enabled := True;
-      generateConfigFilename;
+      _windowName := 'EVE - ' + value;
     end
     else if key = '--window-name' then begin
-      windowName := value;
-      Timer.Enabled := True;
-      generateConfigFilename;
+      _windowName := value;
     end
     else if key = '--form-left' then Left := StrToInt(value)
     else if key = '--form-top' then Top := StrToInt(value)
@@ -662,10 +675,10 @@ begin
   if gameWidth = 0 then gameWidth := Width;
   if gameHeight = 0 then gameHeight := Height;
 
-  if windowName = '' then
-    Caption := 'Evemini'
-  else
-    Caption := 'Evemini - ' + windowName;
+
+  windowName := _windowName;
+  // Надо сохранить конфиг, если он был указан
+  if _config <> '' then config := _config;
 
   if mutex <>0 then
     ReleaseMutex(mutex);
@@ -697,8 +710,6 @@ begin
   DwmUnregisterThumbnail(PH);
   gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
-  Caption := 'Evemini - ' + windowName;
-  Timer.Enabled := true;
 
   GetWindowRect(gameHandle, rect);
   gameX := 0;
@@ -706,7 +717,6 @@ begin
   gameWidth := rect.Width;
   gameHeight := rect.Height;
 
-  generateConfigFilename;
   registerThumbnail;
 
   saveProportion();
@@ -759,12 +769,6 @@ end;
 procedure TFormWindow.menuSetWindowNameClick(Sender: TObject);
 begin
   windowName := InputBox(Application.Title, 'Window Name', windowName);
-
-  if Length(windowName) > 0 then begin
-    Caption := 'Evemini - ' + windowName;
-    Timer.Enabled := true;
-    generateConfigFilename;
-  end;
 end;
 
 procedure TFormWindow.menuWindowHalfOpacityClick(Sender: TObject);

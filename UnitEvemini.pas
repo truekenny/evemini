@@ -137,7 +137,7 @@ begin
     if FormWindow[index] = nil then Continue;
 
     menuItem := TMenuItem.Create(menuWindows);
-    menuItem.Caption := FormWindow[index]._windowName;
+    menuItem.Caption := FormWindow[index].windowName;
     menuItem.Tag := index;
 
     if menuItem.Caption = '' then menuItem.Caption := '# new window';
