@@ -462,6 +462,8 @@ var
 begin
   if gameHandle <> 0 then
     begin
+      DwmUnregisterThumbnail(PH);
+
       if Succeeded(DwmRegisterThumbnail(Handle, gameHandle, @PH))then
          begin
            Props.dwFlags := DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
@@ -551,7 +553,8 @@ procedure TFormWindow.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   ini: TIniFile;
 begin
-  DwmUnregisterThumbnail(PH);
+  // Зачем это здесь?
+  // DwmUnregisterThumbnail(PH);
   Action := caFree;
 
   Timer.Enabled := False;
@@ -714,7 +717,6 @@ procedure TFormWindow.menuDefaultClick(Sender: TObject);
 var
   rect: TRect;
 begin
-  DwmUnregisterThumbnail(PH);
   gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
 
@@ -754,7 +756,6 @@ begin
   _gameHandler := getHandle;
 
   if _gameHandler <> 0 then begin
-    DwmUnregisterThumbnail(PH);
     gameHandle := (Sender as TMenuItem).Tag;
     registerThumbnail;
   end;
