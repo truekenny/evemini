@@ -26,6 +26,7 @@ object FormEvemini: TFormEvemini
     Top = 80
     object menuWindows: TMenuItem
       Caption = 'Windows'
+      ImageIndex = 5
       object menuDefault: TMenuItem
         Caption = 'default'
         Visible = False
@@ -40,6 +41,9 @@ object FormEvemini: TFormEvemini
     object menuCheckforUpdate: TMenuItem
       Caption = 'Check for Update'
       OnClick = menuCheckforUpdateClick
+    end
+    object menuSeparatorQuit: TMenuItem
+      Caption = '-'
     end
     object Quit1: TMenuItem
       Caption = 'Quit'

@@ -56,7 +56,7 @@ type
     menuSeparatorChecks: TMenuItem;
     menuClose: TMenuItem;
     menuSelectTargetRegion: TMenuItem;
-    menuSeparatorQuit: TMenuItem;
+    menuSeparatorClose: TMenuItem;
     menuWindowMovable: TMenuItem;
     menuWindowSizable: TMenuItem;
     menuResizeWindow1x1: TMenuItem;
@@ -76,6 +76,7 @@ type
     menuSelectRegion: TMenuItem;
     menuSetWindowName: TMenuItem;
     menuSearchWindowAgain: TMenuItem;
+    menuForget: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -106,6 +107,7 @@ type
     procedure menuSetWindowNameClick(Sender: TObject);
     procedure menuSearchWindowAgainClick(Sender: TObject);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure menuForgetClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -732,6 +734,12 @@ begin
   saveProportion();
 end;
 
+procedure TFormWindow.menuForgetClick(Sender: TObject);
+begin
+  gameHandle := 0;
+  DwmUnregisterThumbnail(PH);
+end;
+
 procedure TFormWindow.menuNewClick(Sender: TObject);
 var
   params: array of string;
@@ -878,6 +886,7 @@ end;
 
 procedure TFormWindow.PopupMenuPopup(Sender: TObject);
 const
+  STARTUP_IMAGELIST_ICONS_COUNT = 10;
   NO_DATA = -1;
 var
   index : Integer;
@@ -893,8 +902,8 @@ begin
     menuSelectTarget.Delete(1);
 
   // Удаляем картинки окон
-  for index := 5 to imageList.Count - 1 do
-    imageList.Delete(5);
+  for index := STARTUP_IMAGELIST_ICONS_COUNT to imageList.Count - 1 do
+    imageList.Delete(STARTUP_IMAGELIST_ICONS_COUNT);
 
   // Загружаем новые окна
   EnumWindows(@EnumWindowsProc, windowIndex);

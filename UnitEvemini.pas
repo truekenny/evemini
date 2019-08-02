@@ -43,6 +43,7 @@ type
     IdHTTP: TIdHTTP;
     IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
     TrayIcon: TTrayIcon;
+    menuSeparatorQuit: TMenuItem;
     procedure TimerCheckFormsTimer(Sender: TObject);
     procedure Quit1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
