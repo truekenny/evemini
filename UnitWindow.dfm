@@ -14,16 +14,17 @@ object FormWindow: TFormWindow
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   PopupMenu = PopupMenu
-  OnActivate = FormActivate
+  OnActivate = FormActivateOrShow
   OnClose = FormClose
   OnCreate = FormCreate
   OnDblClick = FormDblClick
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
+  OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
   OnResize = FormResize
-  OnShow = FormShow
+  OnShow = FormActivateOrShow
   DesignSize = (
     384
     211)

@@ -3,14 +3,14 @@ program Evemini;
 uses
   Vcl.Forms,
   Winapi.Windows,
-
   AppTrackMenus in 'AppTrackMenus.pas',
   UnitGetBuild in 'UnitGetBuild.pas',
   UnitEvemini in 'UnitEvemini.pas' {FormEvemini},
   UnitInlineMacros in 'UnitInlineMacros.pas',
   UnitProcessLibrary in 'UnitProcessLibrary.pas',
   UnitString in 'UnitString.pas',
-  UnitWindow in 'UnitWindow.pas' {FormWindow};
+  UnitWindow in 'UnitWindow.pas' {FormWindow},
+  UnitOverlay in 'UnitOverlay.pas' {FormOverlay};
 
 const
   WM_COPYDATA = 74;
@@ -61,6 +61,7 @@ begin
 
   // Default form
   Application.CreateForm(TFormEvemini, FormEvemini);
+  Application.CreateForm(TFormOverlay, FormOverlay);
   // First Window
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);

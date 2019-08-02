@@ -119,6 +119,10 @@
         <DCCReference Include="UnitWindow.pas">
             <Form>FormWindow</Form>
         </DCCReference>
+        <DCCReference Include="UnitOverlay.pas">
+            <Form>FormOverlay</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="README.md"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

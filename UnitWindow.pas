@@ -12,6 +12,7 @@ uses
   System.SysUtils,
   UnitGetBuild,
   UnitInlineMacros,
+  UnitOverlay,
   UnitProcessLibrary,
   UnitString,
   Vcl.ActnPopup,
@@ -78,8 +79,7 @@ type
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure FormActivateOrShow(Sender: TObject);
     procedure FormDblClick(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
@@ -105,6 +105,7 @@ type
     procedure menuSelectRegionClick(Sender: TObject);
     procedure menuSetWindowNameClick(Sender: TObject);
     procedure menuSearchWindowAgainClick(Sender: TObject);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -991,7 +992,11 @@ begin
   glueDeltaTop := 0;
 
   mouseDown := Point(X, Y);
- if ssAlt in Shift then Exit;
+  if ssAlt in Shift then begin
+    FormOverlay.Show(BoundsRect);
+
+    Exit;
+  end;
 
   _formPosition := Point(Left, Top);
   // Move form
@@ -1009,11 +1014,22 @@ begin
   else if Button = mbMiddle then Close();
 end;
 
+procedure TFormWindow.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  if ssAlt in Shift then
+    FormOverlay.DrawRect(mouseDown, Point(X, Y))
+  else
+    FormOverlay.Hide;
+end;
+
 procedure TFormWindow.FormMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
 begin
+  FormOverlay.Hide;
+
   if not (ssAlt in Shift) then Exit;
 
   gameXend := gameX + gameWidth;
@@ -1111,7 +1127,7 @@ begin
     end;
 end;
 
-procedure TFormWindow.FormActivate(Sender: TObject);
+procedure TFormWindow.FormActivateOrShow(Sender: TObject);
 begin
   // Always On Top
   SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE);
@@ -1121,20 +1137,6 @@ begin
                 GetWindowLong(Handle, GWL_EXSTYLE) or
                 WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
 
-
-  // - TaskBar
-  ShowWindow(Application.Handle, SW_HIDE);
-end;
-
-procedure TFormWindow.FormShow(Sender: TObject);
-begin
-  // Always On Top
-  SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE);
-
-  // - AltTab
-  SetWindowLong(Handle, GWL_EXSTYLE,
-                GetWindowLong(Handle, GWL_EXSTYLE) or
-                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
 
   // - TaskBar
   ShowWindow(Application.Handle, SW_HIDE);
