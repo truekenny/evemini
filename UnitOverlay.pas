@@ -27,8 +27,17 @@ implementation
 
 procedure TFormOverlay.DrawRect(first, second: TPoint);
 begin
+  Canvas.Brush.Color := Color;
   Canvas.Rectangle(-1, -1, Width + 1, Height + 1);
-  Canvas.Rectangle(first.X, first.Y, second.X, second.Y);
+
+  Canvas.Pen.Color := clBtnFace;
+  Canvas.Brush.Color := clBlack;
+  Canvas.Pen.Style := psDot;
+  Canvas.MoveTo(first.X, first.Y);
+  Canvas.LineTo(second.X, first.Y);
+  Canvas.LineTo(second.X, second.Y);
+  Canvas.LineTo(first.X, second.Y);
+  Canvas.LineTo(first.X, first.Y);
 end;
 
 procedure TFormOverlay.Show(rect: TRect);
@@ -58,9 +67,6 @@ end;
 procedure TFormOverlay.FormCreate(Sender: TObject);
 begin
   DoubleBuffered := True;
-
-  Canvas.Brush.Color := clBlack;
-  Canvas.Pen.Color := clLime;
 end;
 
 end.
