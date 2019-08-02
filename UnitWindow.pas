@@ -426,10 +426,14 @@ begin
   if not Timer.Enabled then Exit;
 
   if (gameHandle <> 0) and IsWindow(gameHandle) then begin
+    Timer.Interval := 50;
+
     // already active
     borderThumbnail(gameHandle = GetForegroundWindow);
 
   end else begin
+    Timer.Interval := 1000;
+
     // not active
     gameHandle := 0;
     _handle := getHandle();
@@ -446,6 +450,7 @@ begin
       gameHandle := _handle;
 
       registerThumbnail;
+      borderThumbnail(gameHandle = GetForegroundWindow);
 
     end;
   end;
