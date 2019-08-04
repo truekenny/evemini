@@ -255,6 +255,7 @@ begin
     if index = windowIndex then Continue;
     if FormWindow[index] = nil then Continue;
     if not FormWindow[index].Visible then Continue;
+    if not FormWindow[index].menuWindowStick.Checked then Continue;
 
     SetLength(leftBorders, Length(leftBorders) + 4);
     leftBorders[Length(leftBorders) - 4] := FormWindow[index].Left - Width;
