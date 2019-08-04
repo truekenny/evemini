@@ -1001,6 +1001,7 @@ begin
   glueDeltaTop := 0;
 
   mouseDown := Point(X, Y);
+
   if ssAlt in Shift then begin
     FormOverlay.Show(BoundsRect);
 
@@ -1025,9 +1026,13 @@ end;
 
 procedure TFormWindow.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
+var
+  mouseMove: TPoint;
 begin
+  mouseMove := Point(X, Y);
+
   if ssAlt in Shift then
-    FormOverlay.DrawRect(mouseDown, Point(X, Y))
+    FormOverlay.DrawRect(mouseDown, mouseMove)
   else
     FormOverlay.Hide;
 end;

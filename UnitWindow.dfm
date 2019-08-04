@@ -38,14 +38,13 @@ object FormWindow: TFormWindow
     Alignment = taRightJustify
     Anchors = [akRight, akBottom]
     Caption = '1.0.0.0'
+    Enabled = False
     Font.Charset = OEM_CHARSET
     Font.Color = clSilver
     Font.Height = -16
     Font.Name = 'Terminal'
     Font.Style = []
     ParentFont = False
-    OnDblClick = FormDblClick
-    OnMouseDown = FormMouseDown
     OnMouseUp = FormMouseUp
     ExplicitLeft = 335
     ExplicitTop = 224
@@ -56,14 +55,13 @@ object FormWindow: TFormWindow
     Width = 140
     Height = 12
     Caption = 'Right-click here to start...'
+    Enabled = False
     Font.Charset = OEM_CHARSET
     Font.Color = clSilver
     Font.Height = -16
     Font.Name = 'Terminal'
     Font.Style = []
     ParentFont = False
-    OnDblClick = FormDblClick
-    OnMouseDown = FormMouseDown
     OnMouseUp = FormMouseUp
   end
   object Timer: TTimer

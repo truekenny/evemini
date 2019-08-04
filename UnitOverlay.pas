@@ -16,6 +16,7 @@ type
     { Public declarations }
     procedure Show(rect: TRect); overload;
     procedure DrawRect(first, second: TPoint);
+    procedure Hide(); overload;
   end;
 
 var
@@ -38,6 +39,14 @@ begin
   Canvas.LineTo(second.X, second.Y);
   Canvas.LineTo(first.X, second.Y);
   Canvas.LineTo(first.X, first.Y);
+end;
+
+procedure TFormOverlay.Hide();
+begin
+  Canvas.Brush.Color := Color;
+  Canvas.Rectangle(-1, -1, Width + 1, Height + 1);
+
+  inherited;
 end;
 
 procedure TFormOverlay.Show(rect: TRect);
