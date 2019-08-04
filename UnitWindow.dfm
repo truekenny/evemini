@@ -151,32 +151,36 @@ object FormWindow: TFormWindow
     end
     object menuWindowMovable: TMenuItem
       AutoCheck = True
-      Caption = 'Window Movable'
+      Caption = 'Movable'
       Checked = True
     end
     object menuWindowSizable: TMenuItem
       AutoCheck = True
-      Caption = 'Window Sizable'
+      Caption = 'Sizable'
       Checked = True
     end
     object menuWindowProportion: TMenuItem
       AutoCheck = True
-      Caption = 'Window Proportion'
+      Caption = 'Proportion'
       Checked = True
     end
     object menuWindowStick: TMenuItem
       AutoCheck = True
-      Caption = 'Window Stick'
+      Caption = 'Stick'
       Checked = True
     end
     object menuWindowHalfOpacity: TMenuItem
       AutoCheck = True
-      Caption = 'Window Half Opacity'
+      Caption = 'Half Opacity'
       OnClick = menuWindowHalfOpacityClick
     end
     object menuInvertWheel: TMenuItem
       AutoCheck = True
       Caption = 'Invert Wheel'
+    end
+    object menuWindowHideIfTagretActive: TMenuItem
+      AutoCheck = True
+      Caption = 'Hide If Tagret Active'
     end
     object menuSeparatorClose: TMenuItem
       Caption = '-'
