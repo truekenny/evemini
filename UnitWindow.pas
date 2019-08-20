@@ -78,6 +78,7 @@ type
     menuSearchWindowAgain: TMenuItem;
     menuForget: TMenuItem;
     menuWindowHideIfTagretActive: TMenuItem;
+    menuWindowBorder: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -134,8 +135,9 @@ type
 
     function getHandle(): Cardinal;
     procedure fresh();
+    procedure freshForm();
     procedure registerThumbnail();
-    procedure borderThumbnail(withBorder: Boolean);
+    procedure borderThumbnail(activeTarget: Boolean);
     procedure generateConfigFilename();
     function isWritable(filename: string): Boolean;
     procedure saveProportion();
@@ -427,19 +429,13 @@ end;
 procedure TFormWindow.fresh;
 var
   _handle: Cardinal;
-  targetActive: Boolean;
 begin
   if not Timer.Enabled then Exit;
 
   if (gameHandle <> 0) and IsWindow(gameHandle) then begin
     Timer.Interval := 50;
 
-    targetActive := gameHandle = GetForegroundWindow;
-
-    // already active
-    borderThumbnail(targetActive);
-
-    Visible := (not targetActive) or (not menuWindowHideIfTagretActive.Checked) or menuAlwaysVisible.Checked;
+    freshForm;
   end else begin
     Timer.Interval := 1000;
 
@@ -459,11 +455,24 @@ begin
 
       registerThumbnail;
 
-      targetActive := gameHandle = GetForegroundWindow;
-      borderThumbnail(targetActive);
-      Visible := (not targetActive) or (not menuWindowHideIfTagretActive.Checked) or menuAlwaysVisible.Checked;
+      freshForm;
     end;
   end;
+end;
+
+procedure TFormWindow.freshForm;
+var
+  targetActive: Boolean;
+begin
+  targetActive := gameHandle = GetForegroundWindow;
+  borderThumbnail(targetActive);
+
+  Visible := (not targetActive) or (not menuWindowHideIfTagretActive.Checked) or menuAlwaysVisible.Checked;
+
+  if targetActive then
+    Color := clLime
+  else
+    Color := clGray;
 end;
 
 procedure TFormWindow.registerThumbnail();
@@ -484,7 +493,7 @@ begin
            Props.opacity := 255;
 
            if Succeeded(DwmUpdateThumbnailProperties(PH, Props))then begin
-             Color := clLime;
+             // Color := clLime;
            end else begin
               Timer.Enabled := False;
               ShowMessage('Properties fail');
@@ -528,7 +537,7 @@ begin
   end;
 end;
 
-procedure TFormWindow.borderThumbnail(withBorder: Boolean);
+procedure TFormWindow.borderThumbnail(activeTarget: Boolean);
 var
   Props: DWM_THUMBNAIL_PROPERTIES;
   borderWidth: Integer;
@@ -539,9 +548,13 @@ begin
 
   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
-  if withBorder and (WindowState <> wsMaximized)
+  if activeTarget and (WindowState <> wsMaximized)
   then borderWidth := 3
-  else borderWidth := 0;
+  else
+    if menuWindowBorder.Checked then
+      borderWidth := 1
+    else
+      borderWidth := 0;
 
   gameBorderWidth := Round(borderWidth * gameWidth / Width);
   gameBorderHeight := Round(borderWidth * gameHeight / Height);
@@ -593,6 +606,7 @@ begin
     ini.WriteBool('check', 'window-proportion', menuWindowProportion.Checked);
     ini.WriteBool('check', 'invert-wheel', menuInvertWheel.Checked);
     ini.WriteBool('check', 'window-stick', menuWindowStick.Checked);
+    ini.WriteBool('check', 'window-border', menuWindowBorder.Checked);
     ini.WriteBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
   finally
     ini.Free;
@@ -650,6 +664,7 @@ begin
         menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
         menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
         menuWindowStick.Checked := ini.ReadBool('check', 'window-stick', menuWindowStick.Checked);
+        menuWindowBorder.Checked := ini.ReadBool('check', 'window-border', menuWindowBorder.Checked);
         menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
         menuWindowHideIfTagretActive.Checked := ini.ReadBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
       finally
@@ -690,6 +705,7 @@ begin
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
     else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
+    else if key = '--window-border' then menuWindowBorder.Checked := StrToBool(value)
     else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
     else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
     else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);

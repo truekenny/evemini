@@ -182,6 +182,10 @@ object FormWindow: TFormWindow
       AutoCheck = True
       Caption = 'Hide If Tagret Active'
     end
+    object menuWindowBorder: TMenuItem
+      AutoCheck = True
+      Caption = 'Border'
+    end
     object menuSeparatorClose: TMenuItem
       Caption = '-'
     end
