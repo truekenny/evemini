@@ -77,6 +77,7 @@ object FormWindow: TFormWindow
     Left = 88
     Top = 80
     object menuSelectTarget: TMenuItem
+      AutoHotkeys = maManual
       Caption = 'Select Target'
       ImageIndex = 0
       object menuDefault: TMenuItem

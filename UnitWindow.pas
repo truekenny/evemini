@@ -133,6 +133,13 @@ type
 
     getHandlerResult: Cardinal;
 
+    defaultWindowColor: TColor;
+    defaultBorderColor: TColor;
+    activeBorderColor: TColor;
+
+    defaultBorderWidth: Integer;
+    activeBorderWidth: Integer;
+
     function getHandle(): Cardinal;
     procedure fresh();
     procedure freshForm();
@@ -447,8 +454,7 @@ begin
       // cant activate
       Visible := menuAlwaysVisible.Checked;
 
-      Color := clBtnFace;
-
+      Color := defaultWindowColor;
     end else begin
       // window found, can activate
       gameHandle := _handle;
@@ -470,9 +476,9 @@ begin
   Visible := (not targetActive) or (not menuWindowHideIfTagretActive.Checked) or menuAlwaysVisible.Checked;
 
   if targetActive then
-    Color := clLime
+    Color := activeBorderColor
   else
-    Color := clGray;
+    Color := defaultBorderColor;
 end;
 
 procedure TFormWindow.registerThumbnail();
@@ -549,10 +555,10 @@ begin
   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
   if activeTarget and (WindowState <> wsMaximized)
-  then borderWidth := 3
+  then borderWidth := activeBorderWidth
   else
     if menuWindowBorder.Checked then
-      borderWidth := 1
+      borderWidth := defaultBorderWidth
     else
       borderWidth := 0;
 
@@ -599,6 +605,12 @@ begin
     ini.WriteInteger('form', 'top', Top);
     ini.WriteInteger('form', 'width', Width);
     ini.WriteInteger('form', 'height', Height);
+    ini.WriteString('form', 'color', ColorToString(defaultWindowColor));
+
+    ini.WriteString('border', 'default-color', ColorToString(defaultBorderColor));
+    ini.WriteString('border', 'active-color', ColorToString(activeBorderColor));
+    ini.WriteInteger('border', 'default-width', defaultBorderWidth);
+    ini.WriteInteger('border', 'active-width', activeBorderWidth);
 
     ini.WriteBool('check', 'window-movable', menuWindowMovable.Checked);
     ini.WriteBool('check', 'window-sizable', menuWindowSizable.Checked);
@@ -631,6 +643,14 @@ var
 begin
   BorderStyle := bsNone;
 
+  // + Default values
+  defaultWindowColor := clBtnFace;
+  defaultBorderColor := clGray;
+  activeBorderColor := clLime;
+  defaultBorderWidth := 1;
+  activeBorderWidth := 3;
+  // - Default values
+
   Visible := true;
   windowIndex := _windowIndex;
 
@@ -658,6 +678,13 @@ begin
         Top := ini.ReadInteger('form', 'top', Top);
         Width := ini.ReadInteger('form', 'width', Width);
         Height := ini.ReadInteger('form', 'height', Height);
+
+        defaultWindowColor := StringToColor(ini.ReadString('form', 'color', ColorToString(defaultWindowColor)));
+
+        defaultBorderColor := StringToColor(ini.ReadString('border', 'default-color', ColorToString(defaultBorderColor)));
+        activeBorderColor := StringToColor(ini.ReadString('border', 'active-color', ColorToString(activeBorderColor)));
+        defaultBorderWidth := ini.ReadInteger('border', 'default-width', defaultBorderWidth);
+        activeBorderWidth := ini.ReadInteger('border', 'active-width', activeBorderWidth);
 
         menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
         menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
@@ -701,6 +728,13 @@ begin
 
     else if key = '--timer' then Timer.Interval := StrToInt(value)
 
+    else if key = '--window-color' then defaultWindowColor := StringToColor(value)
+    else if key = '--border-default-color' then defaultBorderColor := StringToColor(value)
+    else if key = '--border-active-color' then activeBorderColor := StringToColor(value)
+
+    else if key = '--border-default-width' then defaultBorderWidth := StrToInt(value)
+    else if key = '--border-active-width' then activeBorderWidth := StrToInt(value)
+
     else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
     else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
     else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
@@ -719,7 +753,9 @@ begin
   // Надо сохранить конфиг, если он был указан
   if _config <> '' then config := _config;
 
-  if mutex <>0 then
+  Color := defaultWindowColor;
+
+  if mutex <> 0 then
     ReleaseMutex(mutex);
 end;
 

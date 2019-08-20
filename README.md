@@ -38,14 +38,28 @@ Evemini - приложение, дублирующие содержимое ок
 - Другой вариант, это переместить всю конфигурацию в параметры приложения, например:
 
 ```
-evemini --capsuleer-name="Gamer Name" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+evemini^
+ --capsuleer-name="Gamer Name"^
+ --form-left=1866 --form-top=882 --form-width=687 --form-height=160^
+ --game-left=1866 --game-top=550 --game-width=317 --game-height=189^
+ --window-movable=false --window-sizable=false
 ```
 
 - Запуск нескольких копий из batch файла, например, создаём файл `go.bat` со следующим содержимым:
 
 ```
-start /LOW evemini --capsuleer-name="Gamer First" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
-start /LOW evemini --capsuleer-name="Gamer Second" --form-left=1866 --form-top=882 --form-width=687 --form-height=160 --game-left=1866 --game-top=550 --game-width=317 --game-height=189 --window-movable=false --window-sizable=false
+start /LOW evemini^
+ --capsuleer-name="Gamer First"^
+ --form-left=1866 --form-top=882 --form-width=687 --form-height=160^
+ --game-left=1866 --game-top=550 --game-width=317 --game-height=189^
+ --window-movable=false --window-sizable=false
+
+start /LOW evemini^
+ --capsuleer-name="Gamer Second"^
+ --form-left=1866 --form-top=882 --form-width=687 --form-height=160^
+ --game-left=1866 --game-top=550 --game-width=317 --game-height=189^
+ --window-movable=false --window-sizable=false
+
 rem Сколько угодно сразу
 ```
 
@@ -53,14 +67,23 @@ rem Сколько угодно сразу
 
 - `--window-name` - полное имя целевого окна (обязателен или `--capsuleer-name`)
 - `--capsuleer-name` - имя капсулёра (обязателен или `--window-name`)
+
 - `--form-left` - смещение окна приложения от левого края дисплея
 - `--form-top` - смещение окна от верхнего края дисплея
 - `--form-width` - ширина окна
 - `--form-height` - высота окна
+
+- `--window-color` - цвет окна (по умолчанию `clBtnFace`; [Варианты цветов](http://docwiki.embarcadero.com/RADStudio/Rio/en/Colors_in_the_VCL), допустимы форматы вида: **clRed** и **$0000FF**)
+- `--border-default-color` - цвет рамки, пока целевое окно **вне** фокуса (по умолчанию `clGray`)
+- `--border-active-color` - цвет рамки, пока целевое окно **в** фокусе (по умолчанию `clLime`)
+- `--border-default-width` - ширина рамки, пока целевое окно **вне** фокуса (по умолчанию `1`)
+- `--border-active-width` - ширина рамки, пока целевое окно **в** фокусе (по умолчанию `3`)
+
 - `--game-left` - смещение от левого края целевого окна для получения изображения (по умолчанию `0`)
 - `--game-top` - смещение от верхнего края (по умолчанию `0`)
 - `--game-width` - ширина копируемой области (по умолчанию равен размеру окна)
 - `--game-height` - высота (по умолчанию равен размеру окна)
+
 - `--window-movable` - приложение можно передвигать с помощью мышки (по умолчанию `true`)
 - `--window-sizable` - приложению можно изменять размеры (по умолчанию `true`)
 - `--window-proportion` - приложение сохраняет пропорции при изменении его размеров (по умолчанию `true`)
@@ -78,6 +101,37 @@ rem Сколько угодно сразу
 - Опция *Select Window Again* позволяет сбросить текущую цель дублирования и выполнить поиск заново (это может быть полезно, например, при отделении вкладки в браузере);
 - Опция *Forget* позволяет забыть найденное окно (может быть полезно при смене контента окна, например, при переключении вкладки браузера с одного сайта на другой),
 - Если все окна программы закрыты (*не скрыты*), то приложение закрывается.
+
+#### Пример файла конфигурации `Calculator.ini`
+
+```
+[game]
+name=Calculator
+left=0
+top=0
+width=336
+height=509
+[form]
+left=909
+top=829
+width=165
+height=250
+color=clYellow
+[border]
+default-color=clBlue
+active-color=clGreen
+default-width=3
+active-width=6
+[check]
+window-movable=1
+window-sizable=1
+always-visible=1
+window-proportion=1
+invert-wheel=0
+window-stick=1
+window-border=1
+hide-if-target-active=0
+```
 
 #### Похожие программы
 
