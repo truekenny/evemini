@@ -149,6 +149,9 @@ type
     function isWritable(filename: string): Boolean;
     procedure saveProportion();
     procedure setWindowName(str: string);
+    function readConfig(filename: string): string;
+    procedure writeConfig(filename: string);
+    procedure readParam(key, value: string);
 
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
   public
@@ -579,21 +582,30 @@ begin
 end;
 
 procedure TFormWindow.FormClose(Sender: TObject; var Action: TCloseAction);
-var
-  ini: TIniFile;
 begin
-  // Зачем это здесь?
-  // DwmUnregisterThumbnail(PH);
   Action := caFree;
 
   Timer.Enabled := False;
   FormWindow[windowIndex] := nil;
 
-  if config = '' then Exit;
+  writeConfig(config);
+end;
 
-  if not isWritable(config) then Exit;
+procedure TFormWindow.FormCreate(Sender: TObject);
+begin
+  PopupMenu.TrackMenu := True;
+  PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
+end;
 
-  ini := TIniFile.Create(config);
+procedure TFormWindow.writeConfig(filename: string);
+var
+  ini: TIniFile;
+begin
+  if filename = '' then Exit;
+
+  if not isWritable(filename) then Exit;
+
+  ini := TIniFile.Create(filename);
   try
     ini.WriteString('game', 'name', windowName);
     ini.WriteInteger('game', 'left', gameX);
@@ -623,13 +635,75 @@ begin
   finally
     ini.Free;
   end;
-
 end;
 
-procedure TFormWindow.FormCreate(Sender: TObject);
+function TFormWindow.readConfig(filename: string): string;
+var
+  ini: TIniFile;
 begin
-  PopupMenu.TrackMenu := True;
-  PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
+  ini := TIniFile.Create(filename);
+  try
+    Result := ini.ReadString('game', 'name', windowName);
+
+    gameX := ini.ReadInteger('game', 'left', gameX);
+    gameY := ini.ReadInteger('game', 'top', gameY);
+    gameWidth := ini.ReadInteger('game', 'width', gameWidth);
+    gameHeight := ini.ReadInteger('game', 'height', gameHeight);
+
+    Left := ini.ReadInteger('form', 'left', Left);
+    Top := ini.ReadInteger('form', 'top', Top);
+    Width := ini.ReadInteger('form', 'width', Width);
+    Height := ini.ReadInteger('form', 'height', Height);
+
+    defaultWindowColor := StringToColor(ini.ReadString('form', 'color', ColorToString(defaultWindowColor)));
+
+    defaultBorderColor := StringToColor(ini.ReadString('border', 'default-color', ColorToString(defaultBorderColor)));
+    activeBorderColor := StringToColor(ini.ReadString('border', 'active-color', ColorToString(activeBorderColor)));
+    defaultBorderWidth := ini.ReadInteger('border', 'default-width', defaultBorderWidth);
+    activeBorderWidth := ini.ReadInteger('border', 'active-width', activeBorderWidth);
+
+    menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
+    menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
+    menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
+    menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
+    menuWindowStick.Checked := ini.ReadBool('check', 'window-stick', menuWindowStick.Checked);
+    menuWindowBorder.Checked := ini.ReadBool('check', 'window-border', menuWindowBorder.Checked);
+    menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
+    menuWindowHideIfTagretActive.Checked := ini.ReadBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
+  finally
+    ini.Free;
+  end;
+end;
+
+procedure TFormWindow.readParam(key, value: string);
+begin
+  if key = '--form-left' then Left := StrToInt(value)
+  else if key = '--form-top' then Top := StrToInt(value)
+  else if key = '--form-width' then Width := StrToInt(value)
+  else if key = '--form-height' then Height := StrToInt(value)
+
+  else if key = '--game-left' then gameX := StrToInt(value)
+  else if key = '--game-top' then gameY := StrToInt(value)
+  else if key = '--game-width' then gameWidth := StrToInt(value)
+  else if key = '--game-height' then gameHeight := StrToInt(value)
+
+  else if key = '--timer' then Timer.Interval := StrToInt(value)
+
+  else if key = '--window-color' then defaultWindowColor := StringToColor(value)
+  else if key = '--border-default-color' then defaultBorderColor := StringToColor(value)
+  else if key = '--border-active-color' then activeBorderColor := StringToColor(value)
+
+  else if key = '--border-default-width' then defaultBorderWidth := StrToInt(value)
+  else if key = '--border-active-width' then activeBorderWidth := StrToInt(value)
+
+  else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
+  else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
+  else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
+  else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
+  else if key = '--window-border' then menuWindowBorder.Checked := StrToBool(value)
+  else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
+  else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
+  else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
 end;
 
 procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
@@ -638,7 +712,6 @@ var
   param, key, value, _config: string;
   pair: array of string;
 
-  ini: TIniFile;
   _windowName: string;
 begin
   BorderStyle := bsNone;
@@ -665,38 +738,7 @@ begin
     if FileExists(param) then begin
       _config := param;
 
-      ini := TIniFile.Create(_config);
-      try
-        _windowName := ini.ReadString('game', 'name', windowName);
-
-        gameX := ini.ReadInteger('game', 'left', gameX);
-        gameY := ini.ReadInteger('game', 'top', gameY);
-        gameWidth := ini.ReadInteger('game', 'width', gameWidth);
-        gameHeight := ini.ReadInteger('game', 'height', gameHeight);
-
-        Left := ini.ReadInteger('form', 'left', Left);
-        Top := ini.ReadInteger('form', 'top', Top);
-        Width := ini.ReadInteger('form', 'width', Width);
-        Height := ini.ReadInteger('form', 'height', Height);
-
-        defaultWindowColor := StringToColor(ini.ReadString('form', 'color', ColorToString(defaultWindowColor)));
-
-        defaultBorderColor := StringToColor(ini.ReadString('border', 'default-color', ColorToString(defaultBorderColor)));
-        activeBorderColor := StringToColor(ini.ReadString('border', 'active-color', ColorToString(activeBorderColor)));
-        defaultBorderWidth := ini.ReadInteger('border', 'default-width', defaultBorderWidth);
-        activeBorderWidth := ini.ReadInteger('border', 'active-width', activeBorderWidth);
-
-        menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
-        menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
-        menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
-        menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
-        menuWindowStick.Checked := ini.ReadBool('check', 'window-stick', menuWindowStick.Checked);
-        menuWindowBorder.Checked := ini.ReadBool('check', 'window-border', menuWindowBorder.Checked);
-        menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
-        menuWindowHideIfTagretActive.Checked := ini.ReadBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
-      finally
-        ini.Free;
-      end;
+      _windowName := readConfig(_config);
 
       continue;
     end;
@@ -707,42 +749,9 @@ begin
     key := pair[0];
     value := pair[1];
 
-
-    // --name="Elle Tan" --form-x=1868 --form-y=882 --form-width=687 --form-height=160 --game-x=10 --game-y=10 --always-visible=true
-
-    if key = '--capsuleer-name' then begin
-      _windowName := 'EVE - ' + value;
-    end
-    else if key = '--window-name' then begin
-      _windowName := value;
-    end
-    else if key = '--form-left' then Left := StrToInt(value)
-    else if key = '--form-top' then Top := StrToInt(value)
-    else if key = '--form-width' then Width := StrToInt(value)
-    else if key = '--form-height' then Height := StrToInt(value)
-
-    else if key = '--game-left' then gameX := StrToInt(value)
-    else if key = '--game-top' then gameY := StrToInt(value)
-    else if key = '--game-width' then gameWidth := StrToInt(value)
-    else if key = '--game-height' then gameHeight := StrToInt(value)
-
-    else if key = '--timer' then Timer.Interval := StrToInt(value)
-
-    else if key = '--window-color' then defaultWindowColor := StringToColor(value)
-    else if key = '--border-default-color' then defaultBorderColor := StringToColor(value)
-    else if key = '--border-active-color' then activeBorderColor := StringToColor(value)
-
-    else if key = '--border-default-width' then defaultBorderWidth := StrToInt(value)
-    else if key = '--border-active-width' then activeBorderWidth := StrToInt(value)
-
-    else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
-    else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
-    else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
-    else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
-    else if key = '--window-border' then menuWindowBorder.Checked := StrToBool(value)
-    else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
-    else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
-    else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
+    if key = '--capsuleer-name' then _windowName := 'EVE - ' + value
+    else if key = '--window-name' then _windowName := value
+    else readParam(key, value);
   end;
 
   if gameWidth = 0 then gameWidth := Width;
