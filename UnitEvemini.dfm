@@ -45,9 +45,9 @@ object FormEvemini: TFormEvemini
     object menuSeparatorQuit: TMenuItem
       Caption = '-'
     end
-    object Quit1: TMenuItem
+    object menuQuit: TMenuItem
       Caption = 'Quit'
-      OnClick = Quit1Click
+      OnClick = menuQuitClick
     end
   end
   object IdHTTP: TIdHTTP

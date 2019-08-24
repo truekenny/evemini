@@ -36,7 +36,7 @@ type
     TimerCheckForms: TTimer;
     popupMenu: TPopupMenu;
     New1: TMenuItem;
-    Quit1: TMenuItem;
+    menuQuit: TMenuItem;
     menuWindows: TMenuItem;
     menuDefault: TMenuItem;
     menuCheckforUpdate: TMenuItem;
@@ -45,7 +45,7 @@ type
     TrayIcon: TTrayIcon;
     menuSeparatorQuit: TMenuItem;
     procedure TimerCheckFormsTimer(Sender: TObject);
-    procedure Quit1Click(Sender: TObject);
+    procedure menuQuitClick(Sender: TObject);
     procedure New1Click(Sender: TObject);
     procedure popupMenuPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
@@ -149,8 +149,14 @@ begin
   end;
 end;
 
-procedure TFormEvemini.Quit1Click(Sender: TObject);
+procedure TFormEvemini.menuQuitClick(Sender: TObject);
+var
+  index: Integer;
 begin
+  for index := 0 to Length(FormWindow) - 1 do begin
+    if FormWindow[index] <> nil then FormWindow[index].Close;
+  end;
+
   Close();
 end;
 

@@ -5,6 +5,7 @@
 *.local
 *.stat
 Win32/*
+ini/*
 
 run.bat
 evemini.zip
