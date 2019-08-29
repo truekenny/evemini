@@ -11,6 +11,9 @@ uses
   Winapi.TlHelp32,
   Winapi.Windows;
 
+const
+  NO_PATH = '';
+
 function GetPathFromPID(const PID: cardinal): string;
 
   // Get ProcessID By ProgramName (Include Path or Not Include)
@@ -43,13 +46,12 @@ begin
   if hProcess <> 0 then
     try
       if GetModuleFileNameEx(hProcess, 0, path, MAX_PATH) = 0 then
-        RaiseLastOSError;
-      result := path;
+        Exit;
+
+      Result := path;
     finally
       CloseHandle(hProcess)
-    end
-  else
-    RaiseLastOSError;
+    end;
 end;
 
 // Get Window Handle By ProgramName (Include Path or Not Include)

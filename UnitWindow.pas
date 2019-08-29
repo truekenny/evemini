@@ -929,7 +929,7 @@ begin
           pid := GetPIDByHWnd(hWindow);
           if pid <> 0 then begin
             filename := GetPathFromPID(pid);
-            if filename <> '' then begin
+            if filename <> NO_PATH then begin
               HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename), indexIcon);
             end;
           end;
