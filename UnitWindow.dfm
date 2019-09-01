@@ -20,6 +20,8 @@ object FormWindow: TFormWindow
   OnDblClick = FormDblClick
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
+  OnMouseEnter = FormMouseEnter
+  OnMouseLeave = FormMouseLeave
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnMouseWheel = FormMouseWheel
@@ -170,10 +172,10 @@ object FormWindow: TFormWindow
       Caption = 'Stick'
       Checked = True
     end
-    object menuWindowHalfOpacity: TMenuItem
+    object menuWindowOpacityOnLeave: TMenuItem
       AutoCheck = True
-      Caption = 'Half Opacity'
-      OnClick = menuWindowHalfOpacityClick
+      Caption = 'Opacity On Leave'
+      OnClick = menuWindowOpacityOnLeaveClick
     end
     object menuInvertWheel: TMenuItem
       AutoCheck = True

@@ -60,7 +60,7 @@ type
     menuWindowMovable: TMenuItem;
     menuWindowSizable: TMenuItem;
     menuResizeWindow1x1: TMenuItem;
-    menuWindowHalfOpacity: TMenuItem;
+    menuWindowOpacityOnLeave: TMenuItem;
     imageList: TImageList;
     menuWindowProportion: TMenuItem;
     menuAllTargetSpace: TMenuItem;
@@ -91,7 +91,7 @@ type
     procedure menuCloseClick(Sender: TObject);
     procedure menuSelectTargetRegionClick(Sender: TObject);
     procedure menuResizeWindow1x1Click(Sender: TObject);
-    procedure menuWindowHalfOpacityClick(Sender: TObject);
+    procedure menuWindowOpacityOnLeaveClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -110,6 +110,8 @@ type
     procedure menuSearchWindowAgainClick(Sender: TObject);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure menuForgetClick(Sender: TObject);
+    procedure FormMouseEnter(Sender: TObject);
+    procedure FormMouseLeave(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -618,6 +620,8 @@ begin
     ini.WriteInteger('form', 'width', Width);
     ini.WriteInteger('form', 'height', Height);
     ini.WriteString('form', 'color', ColorToString(defaultWindowColor));
+    ini.WriteBool('form', 'opacity-enable', menuWindowOpacityOnLeave.Checked);
+    ini.WriteInteger('form', 'opacity-value', AlphaBlendValue);
 
     ini.WriteString('border', 'default-color', ColorToString(defaultBorderColor));
     ini.WriteString('border', 'active-color', ColorToString(activeBorderColor));
@@ -656,6 +660,9 @@ begin
     Height := ini.ReadInteger('form', 'height', Height);
 
     defaultWindowColor := StringToColor(ini.ReadString('form', 'color', ColorToString(defaultWindowColor)));
+
+    menuWindowOpacityOnLeave.Checked := ini.ReadBool('form', 'opacity-enable', menuWindowOpacityOnLeave.Checked);
+    AlphaBlendValue := ini.ReadInteger('form', 'opacity-value', AlphaBlendValue);
 
     defaultBorderColor := StringToColor(ini.ReadString('border', 'default-color', ColorToString(defaultBorderColor)));
     activeBorderColor := StringToColor(ini.ReadString('border', 'active-color', ColorToString(activeBorderColor)));
@@ -701,6 +708,8 @@ begin
   else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
   else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
   else if key = '--window-border' then menuWindowBorder.Checked := StrToBool(value)
+  else if key = '--window-opacity-enable' then menuWindowOpacityOnLeave.Checked := StrToBool(value)
+  else if key = '--window-opacity-value' then AlphaBlendValue := StrToInt(value)
   else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
   else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
   else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
@@ -763,6 +772,8 @@ begin
   if _config <> '' then config := _config;
 
   Color := defaultWindowColor;
+
+  AlphaBlend := menuWindowOpacityOnLeave.Checked;
 
   if mutex <> 0 then
     ReleaseMutex(mutex);
@@ -873,9 +884,9 @@ begin
   windowName := InputBox(Application.Title, 'Window Name', windowName);
 end;
 
-procedure TFormWindow.menuWindowHalfOpacityClick(Sender: TObject);
+procedure TFormWindow.menuWindowOpacityOnLeaveClick(Sender: TObject);
 begin
-  AlphaBlend := menuWindowHalfOpacity.Checked;
+  AlphaBlend := menuWindowOpacityOnLeave.Checked;
 end;
 
 // Global
@@ -1093,6 +1104,17 @@ begin
     end;
   end
   else if Button = mbMiddle then Close();
+end;
+
+procedure TFormWindow.FormMouseEnter(Sender: TObject);
+begin
+  AlphaBlend := False;
+end;
+
+procedure TFormWindow.FormMouseLeave(Sender: TObject);
+begin
+  if menuWindowOpacityOnLeave.Checked then
+    AlphaBlend := True;
 end;
 
 procedure TFormWindow.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
