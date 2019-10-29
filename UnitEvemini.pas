@@ -29,7 +29,7 @@ uses
 
 const
   WM_ICONTRAY = WM_USER + 1;
-  CURRENT_RELEASE = 'Fourth Release';
+  CURRENT_RELEASE = 'Release #5';
 
 type
   TFormEvemini = class(TForm)
