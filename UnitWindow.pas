@@ -734,7 +734,6 @@ begin
   activeBorderWidth := 3;
   // - Default values
 
-  Visible := true;
   windowIndex := _windowIndex;
 
   FormResize(nil);
@@ -775,6 +774,9 @@ begin
   Color := defaultWindowColor;
 
   AlphaBlend := menuWindowOpacityOnLeave.Checked;
+
+  // При инициализации окно видно, если не выбрано окно для просмотра
+  Visible := windowName = '';
 
   if mutex <> 0 then
     ReleaseMutex(mutex);
