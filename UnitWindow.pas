@@ -473,13 +473,21 @@ end;
 
 procedure TFormWindow.freshForm;
 var
-  targetActive, targetVisible: Boolean;
+  targetActive, targetVisible, targetMinimize: Boolean;
+
+  windowStyle: LongInt;
 begin
   targetActive := gameHandle = GetForegroundWindow;
   targetVisible := IsWindowVisible(gameHandle);
   borderThumbnail(targetActive);
 
-  Visible := ((not targetActive) and targetVisible) or (not menuWindowHideIfTagretActive.Checked) or menuAlwaysVisible.Checked;
+  windowStyle := GetWindowLong(gameHandle, GWL_STYLE);
+  targetMinimize := (windowStyle and Longint(WS_MINIMIZE)) > 0;
+
+  Visible := ((not targetActive) and targetVisible and (not targetMinimize))
+    or ((not menuWindowHideIfTagretActive.Checked) and (not targetMinimize))
+    or menuAlwaysVisible.Checked;
+
 
   if targetActive then
     Color := activeBorderColor
