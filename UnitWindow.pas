@@ -393,15 +393,13 @@ var
   titleLength: Integer;
   titleChars: PChar;
   title, subWindowName: String;
-  windowStyle: Longint;
-  visibleWindow: LongInt;
+  visibleWindow: Boolean;
 begin
   Result := True;
 
   GetMem(titleChars, 256);
 
-  windowStyle := GetWindowLong(hWindow, GWL_STYLE);
-  visibleWindow := windowStyle and Longint(WS_VISIBLE);
+  visibleWindow := IsWindowVisible(hWindow);
 
   titleLength := GetWindowText(hWindow, titleChars, 255);
   title := titleChars;
@@ -409,7 +407,7 @@ begin
 
   if (titleLength > 0)
     and (Pos('Evemini', title) = 0)
-    and (visibleWindow > 0)
+    and (visibleWindow)
     and (Pos(subWindowName ,title) <> 0)
     then begin
       Result := False;
@@ -474,15 +472,12 @@ end;
 procedure TFormWindow.freshForm;
 var
   targetActive, targetVisible, targetMinimize: Boolean;
-
-  windowStyle: LongInt;
 begin
   targetActive := gameHandle = GetForegroundWindow;
   targetVisible := IsWindowVisible(gameHandle);
   borderThumbnail(targetActive);
 
-  windowStyle := GetWindowLong(gameHandle, GWL_STYLE);
-  targetMinimize := (windowStyle and Longint(WS_MINIMIZE)) > 0;
+  targetMinimize := IsIconic(gameHandle);
 
   Visible := ((not targetActive) and targetVisible and (not targetMinimize))
     or ((not menuWindowHideIfTagretActive.Checked) and (not targetMinimize))
@@ -852,16 +847,9 @@ begin
 end;
 
 procedure TFormWindow.menuSearchWindowAgainClick(Sender: TObject);
-var
-  _gameHandler: Cardinal;
 begin
-  _gameHandler := getHandle;
-
-  if _gameHandler <> 0 then begin
-    gameHandle := (Sender as TMenuItem).Tag;
-    registerThumbnail;
-  end;
-
+  gameHandle := 0;
+  DwmUnregisterThumbnail(PH);
 end;
 
 procedure TFormWindow.menuSelectRegionClick(Sender: TObject);
@@ -906,8 +894,7 @@ var
   titleLength: Integer;
   titleChars: PChar;
   title: String;
-  windowStyle: Longint;
-  visibleWindow: LongInt;
+  visibleWindow: Boolean;
 
   menuItem : TMenuItem;
 
@@ -922,15 +909,14 @@ begin
   indexIcon := 0;
   GetMem(titleChars, 256);
 
-  windowStyle := GetWindowLong(hWindow, GWL_STYLE);
-  visibleWindow := windowStyle and Longint(WS_VISIBLE);
+  visibleWindow := IsWindowVisible(hWindow);
 
   titleLength := GetWindowText(hWindow, titleChars, 255);
   title := titleChars;
 
   if (titleLength > 0)
     and (Pos('Evemini', title) = 0)
-    and (visibleWindow > 0)
+    and (visibleWindow)
     then begin
         menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
         menuItem.Caption := title;
