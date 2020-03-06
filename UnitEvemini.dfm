@@ -11,6 +11,7 @@ object FormEvemini: TFormEvemini
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object TimerCheckForms: TTimer
@@ -42,12 +43,23 @@ object FormEvemini: TFormEvemini
       Caption = 'Check for Update'
       OnClick = menuCheckforUpdateClick
     end
+    object menuRefreshAlwaysOnTop: TMenuItem
+      Caption = 'Refresh '#39'Always on top'#39
+      OnClick = menuRefreshAlwaysOnTopClick
+    end
     object menuSeparatorQuit: TMenuItem
       Caption = '-'
     end
     object menuQuit: TMenuItem
       Caption = 'Quit'
       OnClick = menuQuitClick
+    end
+    object menuSeparatorVersion: TMenuItem
+      Caption = '-'
+    end
+    object menuVersion: TMenuItem
+      Caption = 'Version: 1.0.0.0'
+      Enabled = False
     end
   end
   object IdHTTP: TIdHTTP

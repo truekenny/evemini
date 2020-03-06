@@ -25,11 +25,12 @@ uses
   Vcl.Menus,
   Winapi.Messages,
   Winapi.ShellAPI,
-  Winapi.Windows;
+  Winapi.Windows,
+  UnitGetBuild;
 
 const
   WM_ICONTRAY = WM_USER + 1;
-  CURRENT_RELEASE = 'Release #5';
+  CURRENT_RELEASE = 'Release #6';
 
 type
   TFormEvemini = class(TForm)
@@ -44,12 +45,17 @@ type
     IdSSLIOHandlerSocketOpenSSL: TIdSSLIOHandlerSocketOpenSSL;
     TrayIcon: TTrayIcon;
     menuSeparatorQuit: TMenuItem;
+    menuSeparatorVersion: TMenuItem;
+    menuVersion: TMenuItem;
+    menuRefreshAlwaysOnTop: TMenuItem;
     procedure TimerCheckFormsTimer(Sender: TObject);
     procedure menuQuitClick(Sender: TObject);
     procedure New1Click(Sender: TObject);
     procedure popupMenuPopup(Sender: TObject);
     procedure menuDefaultClick(Sender: TObject);
     procedure menuCheckforUpdateClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure menuRefreshAlwaysOnTopClick(Sender: TObject);
   private
     { Private declarations }
 
@@ -80,6 +86,11 @@ begin
   FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params, 0);
 
   params := nil;
+end;
+
+procedure TFormEvemini.FormCreate(Sender: TObject);
+begin
+  menuVersion.Caption := 'Version: ' + GetBuildInfoAsString;
 end;
 
 procedure TFormEvemini.menuCheckforUpdateClick(Sender: TObject);
@@ -158,6 +169,15 @@ begin
   end;
 
   Close();
+end;
+
+procedure TFormEvemini.menuRefreshAlwaysOnTopClick(Sender: TObject);
+var
+  index: Integer;
+begin
+  for index := 0 to Length(FormWindow) - 1 do begin
+    if FormWindow[index] <> nil then FormWindow[index].FormActivateOrShow(Sender);
+  end;
 end;
 
 procedure TFormEvemini.TimerCheckFormsTimer(Sender: TObject);
