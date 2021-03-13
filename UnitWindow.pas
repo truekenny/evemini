@@ -79,6 +79,8 @@ type
     menuForget: TMenuItem;
     menuWindowHideIfTagretActive: TMenuItem;
     menuWindowBorder: TMenuItem;
+    menuSeparatorMinimize: TMenuItem;
+    menuMinimizeTarget: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -112,6 +114,7 @@ type
     procedure menuForgetClick(Sender: TObject);
     procedure FormMouseEnter(Sender: TObject);
     procedure FormMouseLeave(Sender: TObject);
+    procedure menuMinimizeTargetClick(Sender: TObject);
   private
     { Private declarations }
     windowIndex: Integer;
@@ -828,6 +831,11 @@ begin
   DwmUnregisterThumbnail(PH);
 end;
 
+procedure TFormWindow.menuMinimizeTargetClick(Sender: TObject);
+begin
+  ShowWindow(gameHandle, SW_MINIMIZE);
+end;
+
 procedure TFormWindow.menuNewClick(Sender: TObject);
 var
   params: array of string;
@@ -965,7 +973,7 @@ end;
 
 procedure TFormWindow.PopupMenuPopup(Sender: TObject);
 const
-  STARTUP_IMAGELIST_ICONS_COUNT = 10;
+  STARTUP_IMAGELIST_ICONS_COUNT = 11;
   NO_DATA = -1;
 var
   index : Integer;
@@ -976,6 +984,8 @@ var
   _gameWidth, _gameHeight, _gameLeft, _gameTop: Integer;
   menuItem: TMenuItemRegion;
 begin
+  menuMinimizeTarget.Enabled := IsWindow(gameHandle);
+
   // Удаляем все окна
   for index := 1 to menuSelectTarget.Count - 1 do
     menuSelectTarget.Delete(1);
