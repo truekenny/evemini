@@ -400,24 +400,30 @@ var
 begin
   Result := True;
 
-  GetMem(titleChars, 256);
+  try
+    GetMem(titleChars, 256);
 
-  visibleWindow := IsWindowVisible(hWindow);
+    visibleWindow := IsWindowVisible(hWindow);
 
-  titleLength := GetWindowText(hWindow, titleChars, 255);
-  title := titleChars;
-  subWindowName := Copy(FormWindow[_windowIndex].windowName, 2);
+    titleLength := GetWindowText(hWindow, titleChars, 255);
+    title := titleChars;
+    subWindowName := Copy(FormWindow[_windowIndex].windowName, 2);
 
-  if (titleLength > 0)
-    and (Pos('Evemini', title) = 0)
-    and (visibleWindow)
-    and (Pos(subWindowName ,title) <> 0)
-    then begin
-      Result := False;
-      FormWindow[_windowIndex].getHandlerResult := hWindow;
-    end;
+    if (titleLength > 0)
+      and (Pos('Evemini', title) = 0)
+      and (visibleWindow)
+      and (Pos(subWindowName ,title) <> 0)
+      then begin
+        Result := False;
+        FormWindow[_windowIndex].getHandlerResult := hWindow;
+      end;
 
-  FreeMem(titleChars, 256);
+    FreeMem(titleChars, 256);
+  except
+    on E: Exception do
+      ShowMessage(E.ClassName + ' (search): ' + E.Message + #13 + E.StackTrace + #13#13 + E.ToString);
+  end;
+
 end;
 
 
@@ -914,60 +920,65 @@ var
   filename: string;
   indexIcon: Word;
 begin
-  indexIcon := 0;
-  GetMem(titleChars, 256);
+  try
+    indexIcon := 0;
+    GetMem(titleChars, 256);
 
-  visibleWindow := IsWindowVisible(hWindow);
+    visibleWindow := IsWindowVisible(hWindow);
 
-  titleLength := GetWindowText(hWindow, titleChars, 255);
-  title := titleChars;
+    titleLength := GetWindowText(hWindow, titleChars, 255);
+    title := titleChars;
 
-  if (titleLength > 0)
-    and (Pos('Evemini', title) = 0)
-    and (visibleWindow)
-    then begin
-        menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
-        menuItem.Caption := title;
-        menuItem.OnClick :=  FormWindow[_windowIndex].menuDefaultClick;
-        menuItem.Tag := hWindow;
+    if (titleLength > 0)
+      and (Pos('Evemini', title) = 0)
+      and (visibleWindow)
+      then begin
+          menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
+          menuItem.Caption := title;
+          menuItem.OnClick :=  FormWindow[_windowIndex].menuDefaultClick;
+          menuItem.Tag := hWindow;
 
 
-        iconCount := FormWindow[_windowIndex].imageList.Count;
-        // Big icon from window
-        HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
+          iconCount := FormWindow[_windowIndex].imageList.Count;
+          // Big icon from window
+          HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
-        // Small icon from window
-        if HIco = 0 then
-          HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
+          // Small icon from window
+          if HIco = 0 then
+            HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
 
-        // Icon from exe-file
-        if HIco = 0 then begin
-          pid := GetPIDByHWnd(hWindow);
-          if pid <> 0 then begin
-            filename := GetPathFromPID(pid);
-            if filename <> NO_PATH then begin
-              HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename), indexIcon);
+          // Icon from exe-file
+          if HIco = 0 then begin
+            pid := GetPIDByHWnd(hWindow);
+            if pid <> 0 then begin
+              filename := GetPathFromPID(pid);
+              if filename <> NO_PATH then begin
+                HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename), indexIcon);
+              end;
             end;
           end;
-        end;
 
-        Icon := TIcon.Create;
-        try
-          Icon.ReleaseHandle;
-          Icon.Handle := HIco;
-          FormWindow[_windowIndex].imageList.AddIcon(Icon);
-        finally
-          Icon.Free;
-        end;
+          Icon := TIcon.Create;
+          try
+            Icon.ReleaseHandle;
+            Icon.Handle := HIco;
+            FormWindow[_windowIndex].imageList.AddIcon(Icon);
+          finally
+            Icon.Free;
+          end;
 
 
-        if iconCount <> FormWindow[_windowIndex].imageList.Count then
-          menuItem.ImageIndex := FormWindow[_windowIndex].imageList.Count - 1;
+          if iconCount <> FormWindow[_windowIndex].imageList.Count then
+            menuItem.ImageIndex := FormWindow[_windowIndex].imageList.Count - 1;
 
-        FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
-    end;
+          FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
+      end;
 
-  FreeMem(titleChars, 256);
+    FreeMem(titleChars, 256);
+  except
+    on E: Exception do
+      ShowMessage(E.ClassName + ': ' + E.Message + #13 + E.StackTrace + #13#13 + E.ToString);
+  end;
   Result := True;
 end;
 
@@ -1106,6 +1117,10 @@ begin
 
   if Button = mbLeft then begin
     if(_formPosition = Point(Left, Top)) then begin
+      if (IsIconic(gameHandle)) then begin
+         ShowWindow(gameHandle, SW_RESTORE);
+      end;
+
       // Form do not change position
       SetForegroundWindow(gameHandle);
     end;
