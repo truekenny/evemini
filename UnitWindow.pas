@@ -81,6 +81,7 @@ type
     menuWindowBorder: TMenuItem;
     menuSeparatorMinimize: TMenuItem;
     menuMinimizeTarget: TMenuItem;
+    menuChangePriority: TMenuItem;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TimerTimer(Sender: TObject);
@@ -145,8 +146,11 @@ type
     defaultBorderWidth: Integer;
     activeBorderWidth: Integer;
 
+    lastForegroundStatus: Boolean;
+
     function getHandle(): Cardinal;
     procedure fresh();
+    procedure freshPriority(setToNormal: Boolean);
     procedure freshForm();
     procedure registerThumbnail();
     procedure borderThumbnail(activeTarget: Boolean);
@@ -454,6 +458,7 @@ begin
   if (gameHandle <> 0) and IsWindow(gameHandle) then begin
     Timer.Interval := 50;
 
+    freshPriority(False);
     freshForm;
   end else begin
     Timer.Interval := 1000;
@@ -473,9 +478,41 @@ begin
 
       registerThumbnail;
 
+      freshPriority(False);
       freshForm;
     end;
   end;
+end;
+
+procedure TFormWindow.freshPriority(setToNormal: Boolean);
+var
+  targetActive: Boolean;
+  PID: Cardinal;
+  AhProcess: THandle;
+  // error: Cardinal;
+begin
+  if (not menuChangePriority.Checked) then Exit;
+
+  targetActive := gameHandle = GetForegroundWindow;
+
+  if (lastForegroundStatus = targetActive) and (not setToNormal) then Exit;
+
+  PID := GetPIDByHWnd(gameHandle);
+  if (PID = 0) then Exit;
+
+  AhProcess := OpenProcess(PROCESS_ALL_ACCESS, false, PID);
+  if (AhProcess = 0) then Exit;
+
+  if (targetActive or setToNormal) then begin
+    SetPriorityClass(AhProcess, NORMAL_PRIORITY_CLASS);
+  end else begin
+    SetPriorityClass(AhProcess, BELOW_NORMAL_PRIORITY_CLASS);
+  end;
+  // error := GetLastError;
+
+  CloseHandle(AhProcess);
+
+  lastForegroundStatus := targetActive;
 end;
 
 procedure TFormWindow.freshForm;
@@ -604,12 +641,16 @@ begin
   FormWindow[windowIndex] := nil;
 
   writeConfig(config);
+
+  freshPriority(True);
 end;
 
 procedure TFormWindow.FormCreate(Sender: TObject);
 begin
   PopupMenu.TrackMenu := True;
   PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
+
+  lastForegroundStatus := True;
 end;
 
 procedure TFormWindow.writeConfig(filename: string);
@@ -649,6 +690,8 @@ begin
     ini.WriteBool('check', 'window-stick', menuWindowStick.Checked);
     ini.WriteBool('check', 'window-border', menuWindowBorder.Checked);
     ini.WriteBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
+
+    ini.WriteBool('check', 'change-priority', menuChangePriority.Checked);
   finally
     ini.Free;
   end;
@@ -690,6 +733,8 @@ begin
     menuWindowBorder.Checked := ini.ReadBool('check', 'window-border', menuWindowBorder.Checked);
     menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
     menuWindowHideIfTagretActive.Checked := ini.ReadBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
+
+    menuChangePriority.Checked := ini.ReadBool('check', 'change-priority', menuChangePriority.Checked);
   finally
     ini.Free;
   end;
@@ -725,7 +770,8 @@ begin
   else if key = '--window-opacity-value' then AlphaBlendValue := StrToInt(value)
   else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
   else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
-  else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value);
+  else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value)
+  else if key = '--change-priority' then menuChangePriority.Checked := StrToBool(value);
 end;
 
 procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);

@@ -197,6 +197,10 @@ object FormWindow: TFormWindow
       AutoCheck = True
       Caption = 'Border'
     end
+    object menuChangePriority: TMenuItem
+      AutoCheck = True
+      Caption = 'Change Priority'
+    end
     object menuSeparatorClose: TMenuItem
       Caption = '-'
     end
