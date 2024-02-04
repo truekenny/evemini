@@ -557,6 +557,7 @@ begin
              // Color := clLime;
            end else begin
               Timer.Enabled := False;
+              gameHandle := 0;
               ShowMessage('Properties fail');
               Close;
            end;
@@ -564,6 +565,7 @@ begin
       else
         begin
           Timer.Enabled := False;
+          gameHandle := 0;
           ShowMessage('General fail');
           Close;
         end;
@@ -628,6 +630,7 @@ begin
 
   if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
     Timer.Enabled := False;
+    gameHandle := 0;
     ShowMessage('Properties (border) fail');
     Close;
   end;

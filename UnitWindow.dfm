@@ -12,7 +12,6 @@ object FormWindow: TFormWindow
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   PopupMenu = PopupMenu
   OnActivate = FormActivateOrShow
   OnClose = FormClose
@@ -30,7 +29,6 @@ object FormWindow: TFormWindow
   DesignSize = (
     384
     211)
-  PixelsPerInch = 96
   TextHeight = 13
   object labelBuild: TLabel
     Left = 341
