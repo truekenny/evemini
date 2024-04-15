@@ -3,6 +3,7 @@ unit UnitWindow;
 interface
 
 uses
+  DateUtils,
   AppTrackMenus,
   System.Classes,
   System.ImageList,
@@ -61,7 +62,7 @@ type
     menuWindowSizable: TMenuItem;
     menuResizeWindow1x1: TMenuItem;
     menuWindowOpacityOnLeave: TMenuItem;
-    imageList: TImageList;
+    ImageList: TImageList;
     menuWindowProportion: TMenuItem;
     menuAllTargetSpace: TMenuItem;
     menuInvertWheel: TMenuItem;
@@ -148,6 +149,8 @@ type
 
     lastForegroundStatus: Boolean;
 
+    lastShowMessageTime: TDateTime;
+
     function getHandle(): Cardinal;
     procedure fresh();
     procedure freshPriority(setToNormal: Boolean);
@@ -160,17 +163,20 @@ type
     procedure setWindowName(str: string);
     function readConfig(filename: string): string;
     procedure writeConfig(filename: string);
-    procedure readParam(key, value: string);
+    procedure readParam(Key, value: string);
 
-    procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
+    procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem;
+      var CanClose: Boolean);
+    procedure ShowErrorMessage(s: String);
   public
     { Public declarations }
-    procedure initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
+    procedure initialize(_windowIndex: Integer; params: array of string;
+      mutex: Cardinal);
 
-    property windowName:string read fWindowName write setWindowName;
+    property windowName: string read fWindowName write setWindowName;
   protected
-    procedure CreateParams(var Params: TCreateParams); override;
-end;
+    procedure CreateParams(var params: TCreateParams); override;
+  end;
 
 var
   FormWindow: array of TFormWindow;
@@ -183,33 +189,37 @@ procedure TFormWindow.setWindowName(str: string);
 begin
   fWindowName := str;
 
-  if fWindowName = '' then begin
+  if fWindowName = '' then
+  begin
     Timer.Enabled := False;
     config := '';
     Caption := 'Evemini';
   end
-  else begin
+  else
+  begin
     Timer.Enabled := True;
     generateConfigFilename;
     Caption := 'Evemini - ' + fWindowName;
   end;
 end;
 
-procedure TFormWindow.TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
+procedure TFormWindow.TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem;
+  var CanClose: Boolean);
 begin
   CanClose := not Item.AutoCheck;
 end;
 
 // Always On Top
-procedure TFormWindow.CreateParams(var Params: TCreateParams);
+procedure TFormWindow.CreateParams(var params: TCreateParams);
 begin
   inherited;
-  Params.WndParent := 0;
+  params.WndParent := 0;
 end;
 
 procedure TFormWindow.saveProportion();
 begin
-  if not menuWindowProportion.Checked then Exit;
+  if not menuWindowProportion.Checked then
+    Exit;
 
   Width := Round(Height * gameWidth / gameHeight);
   borderThumbnail(gameHandle = GetForegroundWindow);
@@ -221,7 +231,8 @@ var
   Rect: ^TRect;
   aspectRatio: double;
 begin
-  if not menuWindowProportion.Checked then begin
+  if not menuWindowProportion.Checked then
+  begin
     borderThumbnail(gameHandle = GetForegroundWindow);
     Exit;
   end;
@@ -231,11 +242,11 @@ begin
 
   case Message.wParam of
     WMSZ_LEFT, WMSZ_RIGHT, WMSZ_BOTTOMLEFT:
-      Rect.Bottom := Rect.Top + Round((Rect.Right - Rect.Left)/aspectRatio);
+      Rect.Bottom := Rect.Top + Round((Rect.Right - Rect.Left) / aspectRatio);
     WMSZ_TOP, WMSZ_BOTTOM, WMSZ_TOPRIGHT, WMSZ_BOTTOMRIGHT:
-      Rect.Right := Rect.Left + Round((Rect.Bottom - Rect.Top)*aspectRatio);
+      Rect.Right := Rect.Left + Round((Rect.Bottom - Rect.Top) * aspectRatio);
     WMSZ_TOPLEFT:
-      Rect.Top := Rect.Bottom - Round((Rect.Right - Rect.Left)/aspectRatio);
+      Rect.Top := Rect.Bottom - Round((Rect.Right - Rect.Left) / aspectRatio);
   end;
   inherited;
 
@@ -249,18 +260,15 @@ const
 var
   Rect: ^TRect;
 
-  nearCheckingBorderLeft,
-  nearCheckingBorderTop,
-  checkingBorder,
-  index,
-  middle: Integer;
+  nearCheckingBorderLeft, nearCheckingBorderTop, checkingBorder, index,
+    middle: Integer;
 
-  leftBorders,
-  topBorders: array of Integer;
+  leftBorders, topBorders: array of Integer;
 begin
-  if not menuWindowStick.Checked then Exit;
+  if not menuWindowStick.Checked then
+    Exit;
 
-  Rect:= Pointer(Message.LParam);
+  Rect := Pointer(Message.LParam);
 
   // Границы дисплея
   SetLength(leftBorders, 2);
@@ -273,64 +281,82 @@ begin
   topBorders[Length(topBorders) - 1] := Screen.Height - Height;
 
   // Выбираю граничные значения для Left и Top
-  for index := 0 to Length(FormWindow) - 1 do begin
-    if index = windowIndex then Continue;
-    if FormWindow[index] = nil then Continue;
-    if not FormWindow[index].Visible then Continue;
-    if not FormWindow[index].menuWindowStick.Checked then Continue;
+  for index := 0 to Length(FormWindow) - 1 do
+  begin
+    if index = windowIndex then
+      Continue;
+    if FormWindow[index] = nil then
+      Continue;
+    if not FormWindow[index].Visible then
+      Continue;
+    if not FormWindow[index].menuWindowStick.Checked then
+      Continue;
 
     SetLength(leftBorders, Length(leftBorders) + 4);
     leftBorders[Length(leftBorders) - 4] := FormWindow[index].Left - Width;
-    leftBorders[Length(leftBorders) - 3] := FormWindow[index].Left + FormWindow[index].Width - Width;
+    leftBorders[Length(leftBorders) - 3] := FormWindow[index].Left +
+      FormWindow[index].Width - Width;
     leftBorders[Length(leftBorders) - 2] := FormWindow[index].Left;
-    leftBorders[Length(leftBorders) - 1] := FormWindow[index].Left + FormWindow[index].Width;
+    leftBorders[Length(leftBorders) - 1] := FormWindow[index].Left +
+      FormWindow[index].Width;
 
     SetLength(topBorders, Length(topBorders) + 4);
     topBorders[Length(topBorders) - 4] := FormWindow[index].Top - Height;
-    topBorders[Length(topBorders) - 3] := FormWindow[index].Top + FormWindow[index].Height - Height;
+    topBorders[Length(topBorders) - 3] := FormWindow[index].Top + FormWindow
+      [index].Height - Height;
     topBorders[Length(topBorders) - 2] := FormWindow[index].Top;
-    topBorders[Length(topBorders) - 1] := FormWindow[index].Top + FormWindow[index].Height;
+    topBorders[Length(topBorders) - 1] := FormWindow[index].Top + FormWindow
+      [index].Height;
   end;
-
 
   nearCheckingBorderLeft := BREAK_NEAR;
   nearCheckingBorderTop := BREAK_NEAR;
-  for index := 0 to Length(leftBorders) - 1 do begin
+  for index := 0 to Length(leftBorders) - 1 do
+  begin
     // Проверяю левую границу, устанавливаю новое значение Left
     checkingBorder := leftBorders[index];
-    if (Rect.Left > checkingBorder - DELTA) and (Rect.Left < checkingBorder + DELTA) then begin
+    if (Rect.Left > checkingBorder - DELTA) and
+      (Rect.Left < checkingBorder + DELTA) then
+    begin
       // Ищу наиболее подходящее значение
-      if Abs(nearCheckingBorderLeft - Rect.Left) > Abs(checkingBorder - Rect.Left) then
+      if Abs(nearCheckingBorderLeft - Rect.Left) >
+        Abs(checkingBorder - Rect.Left) then
         nearCheckingBorderLeft := checkingBorder;
     end;
 
     // Проверяю верхнюю границу, устанавливаю новое значение Top
     checkingBorder := topBorders[index];
-    if (Rect.Top > checkingBorder - DELTA) and (Rect.Top < checkingBorder + DELTA) then begin
+    if (Rect.Top > checkingBorder - DELTA) and
+      (Rect.Top < checkingBorder + DELTA) then
+    begin
       // Ищу наиболее подходящее значение
-      if Abs(nearCheckingBorderTop - Rect.Top) > Abs(checkingBorder - Rect.Top) then
+      if Abs(nearCheckingBorderTop - Rect.Top) > Abs(checkingBorder - Rect.Top)
+      then
         nearCheckingBorderTop := checkingBorder;
     end;
   end;
 
-  if nearCheckingBorderLeft <> BREAK_NEAR then begin
-      glueDeltaLeft := glueDeltaLeft + Rect.Left - Left;
+  if nearCheckingBorderLeft <> BREAK_NEAR then
+  begin
+    glueDeltaLeft := glueDeltaLeft + Rect.Left - Left;
 
-      middle := Rect.Width;
-      Rect.Left := nearCheckingBorderLeft;
-      Rect.Width := middle;
+    middle := Rect.Width;
+    Rect.Left := nearCheckingBorderLeft;
+    Rect.Width := middle;
   end;
 
-  if nearCheckingBorderTop <> BREAK_NEAR then begin
-      glueDeltaTop := glueDeltaTop + Rect.Top - Top;
+  if nearCheckingBorderTop <> BREAK_NEAR then
+  begin
+    glueDeltaTop := glueDeltaTop + Rect.Top - Top;
 
-      middle := Rect.Height;
-      Rect.Top := nearCheckingBorderTop;
-      Rect.Height := middle;
+    middle := Rect.Height;
+    Rect.Top := nearCheckingBorderTop;
+    Rect.Height := middle;
   end;
 
   // Проверяю не вышел ли курсор за правый предел glue_DELTA границы
-  if glueDeltaLeft >= DELTA then begin
+  if glueDeltaLeft >= DELTA then
+  begin
     glueDeltaLeft := 0;
 
     middle := Rect.Width;
@@ -339,7 +365,8 @@ begin
   end;
 
   // Проверяю не вышел ли курсор за левый предел glue_DELTA границы
-  if glueDeltaLeft <= -DELTA then begin
+  if glueDeltaLeft <= -DELTA then
+  begin
     glueDeltaLeft := 0;
 
     middle := Rect.Width;
@@ -348,7 +375,8 @@ begin
   end;
 
   // Проверяю не вышел ли курсор за нижний предел glue_DELTA границы
-  if glueDeltaTop >= DELTA then begin
+  if glueDeltaTop >= DELTA then
+  begin
     glueDeltaTop := 0;
 
     middle := Rect.Height;
@@ -357,7 +385,8 @@ begin
   end;
 
   // Проверяю не вышел ли курсор за верхний предел glue_DELTA границы
-  if glueDeltaTop <= -DELTA then begin
+  if glueDeltaTop <= -DELTA then
+  begin
     glueDeltaTop := 0;
 
     middle := Rect.Height;
@@ -376,7 +405,8 @@ begin
   H := CreateFile(PChar(filename), GENERIC_READ or GENERIC_WRITE, 0, nil,
     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
   Result := H <> INVALID_HANDLE_VALUE;
-  if Result then CloseHandle(H);
+  if Result then
+    CloseHandle(H);
 end;
 
 procedure TFormWindow.generateConfigFilename();
@@ -389,13 +419,15 @@ begin
   config := RegEx.Replace(config, '');
   config := Trim(config);
 
-  if config = '' then Exit;
+  if config = '' then
+    Exit;
 
   config := ExtractFilePath(ParamStr(0)) + config + '.ini';
 end;
 
 // Global
-function SearchMaskEnumWindowsProc(hWindow: HWND; _windowIndex:Cardinal): Bool; stdcall;
+function SearchMaskEnumWindowsProc(hWindow: HWND; _windowIndex: Cardinal)
+  : Bool; stdcall;
 var
   titleLength: Integer;
   titleChars: PChar;
@@ -413,27 +445,26 @@ begin
     title := titleChars;
     subWindowName := Copy(FormWindow[_windowIndex].windowName, 2);
 
-    if (titleLength > 0)
-      and (Pos('Evemini', title) = 0)
-      and (visibleWindow)
-      and (Pos(subWindowName ,title) <> 0)
-      then begin
-        Result := False;
-        FormWindow[_windowIndex].getHandlerResult := hWindow;
-      end;
+    if (titleLength > 0) and (Pos('Evemini', title) = 0) and (visibleWindow) and
+      (Pos(subWindowName, title) <> 0) then
+    begin
+      Result := False;
+      FormWindow[_windowIndex].getHandlerResult := hWindow;
+    end;
 
     FreeMem(titleChars, 256);
   except
     on E: Exception do
-      ShowMessage(E.ClassName + ' (search): ' + E.Message + #13 + E.StackTrace + #13#13 + E.ToString);
+      ShowMessage(E.ClassName + ' (search): ' + E.Message + #13 + E.StackTrace +
+        #13#13 + E.ToString);
   end;
 
 end;
 
-
 function TFormWindow.getHandle(): Cardinal;
 begin
-  if (Length(windowName) > 0) and (windowName[1] = '*') then begin
+  if (Length(windowName) > 0) and (windowName[1] = '*') then
+  begin
     getHandlerResult := 0;
 
     EnumWindows(@SearchMaskEnumWindowsProc, windowIndex);
@@ -453,26 +484,33 @@ procedure TFormWindow.fresh;
 var
   _handle: Cardinal;
 begin
-  if not Timer.Enabled then Exit;
+  if not Timer.Enabled then
+    Exit;
 
-  if (gameHandle <> 0) and IsWindow(gameHandle) then begin
+  if (gameHandle <> 0) and IsWindow(gameHandle) then
+  begin
     Timer.Interval := 50;
 
     freshPriority(False);
     freshForm;
-  end else begin
+  end
+  else
+  begin
     Timer.Interval := 1000;
 
     // not active
     gameHandle := 0;
     _handle := getHandle();
 
-    if _handle = 0 then begin
+    if _handle = 0 then
+    begin
       // cant activate
       Visible := menuAlwaysVisible.Checked;
 
       Color := defaultWindowColor;
-    end else begin
+    end
+    else
+    begin
       // window found, can activate
       gameHandle := _handle;
 
@@ -491,21 +529,28 @@ var
   AhProcess: THandle;
   // error: Cardinal;
 begin
-  if (not menuChangePriority.Checked) then Exit;
+  if (not menuChangePriority.Checked) then
+    Exit;
 
   targetActive := gameHandle = GetForegroundWindow;
 
-  if (lastForegroundStatus = targetActive) and (not setToNormal) then Exit;
+  if (lastForegroundStatus = targetActive) and (not setToNormal) then
+    Exit;
 
   PID := GetPIDByHWnd(gameHandle);
-  if (PID = 0) then Exit;
+  if (PID = 0) then
+    Exit;
 
-  AhProcess := OpenProcess(PROCESS_ALL_ACCESS, false, PID);
-  if (AhProcess = 0) then Exit;
+  AhProcess := OpenProcess(PROCESS_ALL_ACCESS, False, PID);
+  if (AhProcess = 0) then
+    Exit;
 
-  if (targetActive or setToNormal) then begin
+  if (targetActive or setToNormal) then
+  begin
     SetPriorityClass(AhProcess, NORMAL_PRIORITY_CLASS);
-  end else begin
+  end
+  else
+  begin
     SetPriorityClass(AhProcess, BELOW_NORMAL_PRIORITY_CLASS);
   end;
   // error := GetLastError;
@@ -525,10 +570,9 @@ begin
 
   targetMinimize := IsIconic(gameHandle);
 
-  Visible := ((not targetActive) and targetVisible and (not targetMinimize))
-    or ((not menuWindowHideIfTagretActive.Checked) and (not targetMinimize))
-    or menuAlwaysVisible.Checked;
-
+  Visible := ((not targetActive) and targetVisible and (not targetMinimize)) or
+    ((not menuWindowHideIfTagretActive.Checked) and (not targetMinimize)) or
+    menuAlwaysVisible.Checked;
 
   if targetActive then
     Color := activeBorderColor
@@ -541,35 +585,38 @@ var
   Props: DWM_THUMBNAIL_PROPERTIES;
 begin
   if gameHandle <> 0 then
+  begin
+    DwmUnregisterThumbnail(PH);
+
+    if Succeeded(DwmRegisterThumbnail(Handle, gameHandle, @PH)) then
     begin
-      DwmUnregisterThumbnail(PH);
+      Props.dwFlags := DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
+        DWM_TNP_OPACITY;
 
-      if Succeeded(DwmRegisterThumbnail(Handle, gameHandle, @PH))then
-         begin
-           Props.dwFlags := DWM_TNP_SOURCECLIENTAREAONLY or DWM_TNP_VISIBLE or
-                            DWM_TNP_OPACITY;
+      Props.fSourceClientAreaOnly := False;
+      Props.fVisible := True;
+      Props.opacity := 255;
 
-           Props.fSourceClientAreaOnly := false;
-           Props.fVisible := true;
-           Props.opacity := 255;
-
-           if Succeeded(DwmUpdateThumbnailProperties(PH, Props))then begin
-             // Color := clLime;
-           end else begin
-              Timer.Enabled := False;
-              gameHandle := 0;
-              ShowMessage('Properties fail');
-              Close;
-           end;
-         end
+      if Succeeded(DwmUpdateThumbnailProperties(PH, Props)) then
+      begin
+        // Color := clLime;
+      end
       else
-        begin
-          Timer.Enabled := False;
-          gameHandle := 0;
-          ShowMessage('General fail');
-          Close;
-        end;
+      begin
+        Timer.Enabled := False;
+        gameHandle := 0;
+        ShowErrorMessage('Properties fail');
+        Close;
+      end;
+    end
+    else
+    begin
+      Timer.Enabled := False;
+      gameHandle := 0;
+      ShowErrorMessage('General fail');
+      Close;
     end;
+  end;
 end;
 
 procedure TFormWindow.menuSaveCurrentRegionClick(Sender: TObject);
@@ -581,8 +628,9 @@ var
   count: Integer;
   name: string;
 begin
-  name := InputBox(Application.Title, 'Region name', NO_DATA);
-  if name = NO_DATA then Exit;
+  name := InputBox(Application.title, 'Region name', NO_DATA);
+  if name = NO_DATA then
+    Exit;
 
   config := ExtractFilePath(ParamStr(0)) + 'regions.ini';
   ini := TIniFile.Create(config);
@@ -607,31 +655,32 @@ var
   gameBorderWidth: Integer;
   gameBorderHeight: Integer;
 begin
-  if gameHandle = 0 then Exit;
+  if gameHandle = 0 then
+    Exit;
 
   Props.dwFlags := DWM_TNP_RECTDESTINATION or DWM_TNP_RECTSOURCE;
 
-  if activeTarget and (WindowState <> wsMaximized)
-  then borderWidth := activeBorderWidth
+  if activeTarget and (WindowState <> wsMaximized) then
+    borderWidth := activeBorderWidth
+  else if menuWindowBorder.Checked then
+    borderWidth := defaultBorderWidth
   else
-    if menuWindowBorder.Checked then
-      borderWidth := defaultBorderWidth
-    else
-      borderWidth := 0;
+    borderWidth := 0;
 
   gameBorderWidth := Round(borderWidth * gameWidth / Width);
   gameBorderHeight := Round(borderWidth * gameHeight / Height);
 
-  Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth, Height-borderWidth);
-  Props.rcSource := Rect(
-    Point(gameX + gameBorderWidth ,gameY + gameBorderHeight),
-    Point(gameX + gameWidth - gameBorderWidth, gameY + gameHeight - gameBorderHeight)
-  );
+  Props.rcDestination := Rect(borderWidth, borderWidth, Width - borderWidth,
+    Height - borderWidth);
+  Props.rcSource := Rect(Point(gameX + gameBorderWidth,
+    gameY + gameBorderHeight), Point(gameX + gameWidth - gameBorderWidth,
+    gameY + gameHeight - gameBorderHeight));
 
-  if not Succeeded(DwmUpdateThumbnailProperties(PH,Props))then begin
+  if not Succeeded(DwmUpdateThumbnailProperties(PH, Props)) then
+  begin
     Timer.Enabled := False;
     gameHandle := 0;
-    ShowMessage('Properties (border) fail');
+    ShowErrorMessage('Properties (border) fail');
     Close;
   end;
 end;
@@ -650,6 +699,8 @@ end;
 
 procedure TFormWindow.FormCreate(Sender: TObject);
 begin
+  lastShowMessageTime := EncodeDate(2000, 1, 1);
+
   PopupMenu.TrackMenu := True;
   PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
 
@@ -660,9 +711,11 @@ procedure TFormWindow.writeConfig(filename: string);
 var
   ini: TIniFile;
 begin
-  if filename = '' then Exit;
+  if filename = '' then
+    Exit;
 
-  if not isWritable(filename) then Exit;
+  if not isWritable(filename) then
+    Exit;
 
   ini := TIniFile.Create(filename);
   try
@@ -680,7 +733,8 @@ begin
     ini.WriteBool('form', 'opacity-enable', menuWindowOpacityOnLeave.Checked);
     ini.WriteInteger('form', 'opacity-value', AlphaBlendValue);
 
-    ini.WriteString('border', 'default-color', ColorToString(defaultBorderColor));
+    ini.WriteString('border', 'default-color',
+      ColorToString(defaultBorderColor));
     ini.WriteString('border', 'active-color', ColorToString(activeBorderColor));
     ini.WriteInteger('border', 'default-width', defaultBorderWidth);
     ini.WriteInteger('border', 'active-width', activeBorderWidth);
@@ -692,7 +746,8 @@ begin
     ini.WriteBool('check', 'invert-wheel', menuInvertWheel.Checked);
     ini.WriteBool('check', 'window-stick', menuWindowStick.Checked);
     ini.WriteBool('check', 'window-border', menuWindowBorder.Checked);
-    ini.WriteBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
+    ini.WriteBool('check', 'hide-if-target-active',
+      menuWindowHideIfTagretActive.Checked);
 
     ini.WriteBool('check', 'change-priority', menuChangePriority.Checked);
   finally
@@ -718,69 +773,112 @@ begin
     Width := ini.ReadInteger('form', 'width', Width);
     Height := ini.ReadInteger('form', 'height', Height);
 
-    defaultWindowColor := StringToColor(ini.ReadString('form', 'color', ColorToString(defaultWindowColor)));
+    defaultWindowColor := StringToColor(ini.ReadString('form', 'color',
+      ColorToString(defaultWindowColor)));
 
-    menuWindowOpacityOnLeave.Checked := ini.ReadBool('form', 'opacity-enable', menuWindowOpacityOnLeave.Checked);
-    AlphaBlendValue := ini.ReadInteger('form', 'opacity-value', AlphaBlendValue);
+    menuWindowOpacityOnLeave.Checked := ini.ReadBool('form', 'opacity-enable',
+      menuWindowOpacityOnLeave.Checked);
+    AlphaBlendValue := ini.ReadInteger('form', 'opacity-value',
+      AlphaBlendValue);
 
-    defaultBorderColor := StringToColor(ini.ReadString('border', 'default-color', ColorToString(defaultBorderColor)));
-    activeBorderColor := StringToColor(ini.ReadString('border', 'active-color', ColorToString(activeBorderColor)));
-    defaultBorderWidth := ini.ReadInteger('border', 'default-width', defaultBorderWidth);
-    activeBorderWidth := ini.ReadInteger('border', 'active-width', activeBorderWidth);
+    defaultBorderColor := StringToColor(ini.ReadString('border',
+      'default-color', ColorToString(defaultBorderColor)));
+    activeBorderColor := StringToColor(ini.ReadString('border', 'active-color',
+      ColorToString(activeBorderColor)));
+    defaultBorderWidth := ini.ReadInteger('border', 'default-width',
+      defaultBorderWidth);
+    activeBorderWidth := ini.ReadInteger('border', 'active-width',
+      activeBorderWidth);
 
-    menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable', menuWindowMovable.Checked);
-    menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable', menuWindowSizable.Checked);
-    menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible', menuAlwaysVisible.Checked);
-    menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion', menuWindowProportion.Checked);
-    menuWindowStick.Checked := ini.ReadBool('check', 'window-stick', menuWindowStick.Checked);
-    menuWindowBorder.Checked := ini.ReadBool('check', 'window-border', menuWindowBorder.Checked);
-    menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel', menuInvertWheel.Checked);
-    menuWindowHideIfTagretActive.Checked := ini.ReadBool('check', 'hide-if-target-active', menuWindowHideIfTagretActive.Checked);
+    menuWindowMovable.Checked := ini.ReadBool('check', 'window-movable',
+      menuWindowMovable.Checked);
+    menuWindowSizable.Checked := ini.ReadBool('check', 'window-sizable',
+      menuWindowSizable.Checked);
+    menuAlwaysVisible.Checked := ini.ReadBool('check', 'always-visible',
+      menuAlwaysVisible.Checked);
+    menuWindowProportion.Checked := ini.ReadBool('check', 'window-proportion',
+      menuWindowProportion.Checked);
+    menuWindowStick.Checked := ini.ReadBool('check', 'window-stick',
+      menuWindowStick.Checked);
+    menuWindowBorder.Checked := ini.ReadBool('check', 'window-border',
+      menuWindowBorder.Checked);
+    menuInvertWheel.Checked := ini.ReadBool('check', 'invert-wheel',
+      menuInvertWheel.Checked);
+    menuWindowHideIfTagretActive.Checked :=
+      ini.ReadBool('check', 'hide-if-target-active',
+      menuWindowHideIfTagretActive.Checked);
 
-    menuChangePriority.Checked := ini.ReadBool('check', 'change-priority', menuChangePriority.Checked);
+    menuChangePriority.Checked := ini.ReadBool('check', 'change-priority',
+      menuChangePriority.Checked);
   finally
     ini.Free;
   end;
 end;
 
-procedure TFormWindow.readParam(key, value: string);
+procedure TFormWindow.readParam(Key, value: string);
 begin
-  if key = '--form-left' then Left := StrToInt(value)
-  else if key = '--form-top' then Top := StrToInt(value)
-  else if key = '--form-width' then Width := StrToInt(value)
-  else if key = '--form-height' then Height := StrToInt(value)
+  if Key = '--form-left' then
+    Left := StrToInt(value)
+  else if Key = '--form-top' then
+    Top := StrToInt(value)
+  else if Key = '--form-width' then
+    Width := StrToInt(value)
+  else if Key = '--form-height' then
+    Height := StrToInt(value)
 
-  else if key = '--game-left' then gameX := StrToInt(value)
-  else if key = '--game-top' then gameY := StrToInt(value)
-  else if key = '--game-width' then gameWidth := StrToInt(value)
-  else if key = '--game-height' then gameHeight := StrToInt(value)
+  else if Key = '--game-left' then
+    gameX := StrToInt(value)
+  else if Key = '--game-top' then
+    gameY := StrToInt(value)
+  else if Key = '--game-width' then
+    gameWidth := StrToInt(value)
+  else if Key = '--game-height' then
+    gameHeight := StrToInt(value)
 
-  else if key = '--timer' then Timer.Interval := StrToInt(value)
+  else if Key = '--timer' then
+    Timer.Interval := StrToInt(value)
 
-  else if key = '--window-color' then defaultWindowColor := StringToColor(value)
-  else if key = '--border-default-color' then defaultBorderColor := StringToColor(value)
-  else if key = '--border-active-color' then activeBorderColor := StringToColor(value)
+  else if Key = '--window-color' then
+    defaultWindowColor := StringToColor(value)
+  else if Key = '--border-default-color' then
+    defaultBorderColor := StringToColor(value)
+  else if Key = '--border-active-color' then
+    activeBorderColor := StringToColor(value)
 
-  else if key = '--border-default-width' then defaultBorderWidth := StrToInt(value)
-  else if key = '--border-active-width' then activeBorderWidth := StrToInt(value)
+  else if Key = '--border-default-width' then
+    defaultBorderWidth := StrToInt(value)
+  else if Key = '--border-active-width' then
+    activeBorderWidth := StrToInt(value)
 
-  else if key = '--window-movable' then menuWindowMovable.Checked := StrToBool(value)
-  else if key = '--window-sizable' then menuWindowSizable.Checked := StrToBool(value)
-  else if key = '--window-proportion' then menuWindowProportion.Checked := StrToBool(value)
-  else if key = '--window-stick' then menuWindowStick.Checked := StrToBool(value)
-  else if key = '--window-border' then menuWindowBorder.Checked := StrToBool(value)
-  else if key = '--window-opacity-enable' then menuWindowOpacityOnLeave.Checked := StrToBool(value)
-  else if key = '--window-opacity-value' then AlphaBlendValue := StrToInt(value)
-  else if key = '--invert-wheel' then menuInvertWheel.Checked := StrToBool(value)
-  else if key = '--hide-if-target-active' then menuWindowHideIfTagretActive.Checked := StrToBool(value)
-  else if key = '--always-visible' then menuAlwaysVisible.Checked := StrToBool(value)
-  else if key = '--change-priority' then menuChangePriority.Checked := StrToBool(value);
+  else if Key = '--window-movable' then
+    menuWindowMovable.Checked := StrToBool(value)
+  else if Key = '--window-sizable' then
+    menuWindowSizable.Checked := StrToBool(value)
+  else if Key = '--window-proportion' then
+    menuWindowProportion.Checked := StrToBool(value)
+  else if Key = '--window-stick' then
+    menuWindowStick.Checked := StrToBool(value)
+  else if Key = '--window-border' then
+    menuWindowBorder.Checked := StrToBool(value)
+  else if Key = '--window-opacity-enable' then
+    menuWindowOpacityOnLeave.Checked := StrToBool(value)
+  else if Key = '--window-opacity-value' then
+    AlphaBlendValue := StrToInt(value)
+  else if Key = '--invert-wheel' then
+    menuInvertWheel.Checked := StrToBool(value)
+  else if Key = '--hide-if-target-active' then
+    menuWindowHideIfTagretActive.Checked := StrToBool(value)
+  else if Key = '--always-visible' then
+    menuAlwaysVisible.Checked := StrToBool(value)
+  else if Key = '--change-priority' then
+    menuChangePriority.Checked := StrToBool(value);
 end;
 
-procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string; mutex: Cardinal);
+procedure TFormWindow.initialize(_windowIndex: Integer; params: array of string;
+  mutex: Cardinal);
 var
   index: Integer;
-  param, key, value, _config: string;
+  param, Key, value, _config: string;
   pair: array of string;
 
   _windowName: string;
@@ -802,35 +900,41 @@ begin
 
   SetLength(pair, 2);
 
-  for index := 0 to Length(params) - 1 do begin
+  for index := 0 to Length(params) - 1 do
+  begin
     param := params[index];
 
-    if FileExists(param) then begin
+    if FileExists(param) then
+    begin
       _config := param;
 
       _windowName := readConfig(_config);
 
-      continue;
+      Continue;
     end;
-
 
     explode(pair, '=', param);
 
-    key := pair[0];
+    Key := pair[0];
     value := pair[1];
 
-    if key = '--capsuleer-name' then _windowName := 'EVE - ' + value
-    else if key = '--window-name' then _windowName := value
-    else readParam(key, value);
+    if Key = '--capsuleer-name' then
+      _windowName := 'EVE - ' + value
+    else if Key = '--window-name' then
+      _windowName := value
+    else
+      readParam(Key, value);
   end;
 
-  if gameWidth = 0 then gameWidth := Width;
-  if gameHeight = 0 then gameHeight := Height;
-
+  if gameWidth = 0 then
+    gameWidth := Width;
+  if gameHeight = 0 then
+    gameHeight := Height;
 
   windowName := _windowName;
   // Надо сохранить конфиг, если он был указан
-  if _config <> '' then config := _config;
+  if _config <> '' then
+    config := _config;
 
   Color := defaultWindowColor;
 
@@ -851,29 +955,29 @@ end;
 
 procedure TFormWindow.menuAllTargetSpaceClick(Sender: TObject);
 var
-  rect: TRect;
+  Rect: TRect;
 begin
-  GetWindowRect(gameHandle, rect);
+  GetWindowRect(gameHandle, Rect);
   gameX := 0;
   gameY := 0;
-  gameWidth := rect.Width;
-  gameHeight := rect.Height;
+  gameWidth := Rect.Width;
+  gameHeight := Rect.Height;
 
   saveProportion();
 end;
 
 procedure TFormWindow.menuDefaultClick(Sender: TObject);
 var
-  rect: TRect;
+  Rect: TRect;
 begin
   gameHandle := (Sender as TMenuItem).Tag;
   windowName := (Sender as TMenuItem).Caption;
 
-  GetWindowRect(gameHandle, rect);
+  GetWindowRect(gameHandle, Rect);
   gameX := 0;
   gameY := 0;
-  gameWidth := rect.Width;
-  gameHeight := rect.Height;
+  gameWidth := Rect.Width;
+  gameHeight := Rect.Height;
 
   registerThumbnail;
 
@@ -899,7 +1003,8 @@ begin
 
   SetLength(FormWindow, Length(FormWindow) + 1);
   Application.CreateForm(TFormWindow, FormWindow[Length(FormWindow) - 1]);
-  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1, params, 0);
+  FormWindow[Length(FormWindow) - 1].initialize(Length(FormWindow) - 1,
+    params, 0);
 
   params := nil;
 end;
@@ -919,8 +1024,8 @@ procedure TFormWindow.menuSelectRegionClick(Sender: TObject);
 begin
   gameWidth := (Sender as TMenuItemRegion).gameWidth;
   gameHeight := (Sender as TMenuItemRegion).gameHeight;
-  gameX :=  (Sender as TMenuItemRegion).gameLeft;
-  gameY :=  (Sender as TMenuItemRegion).gameTop;
+  gameX := (Sender as TMenuItemRegion).gameLeft;
+  gameY := (Sender as TMenuItemRegion).gameTop;
 
   Width := gameWidth;
   Height := gameHeight;
@@ -930,12 +1035,12 @@ end;
 
 procedure TFormWindow.menuSelectTargetRegionClick(Sender: TObject);
 var
-  rect: TRect;
+  Rect: TRect;
 begin
-  GetWindowRect(gameHandle, rect);
+  GetWindowRect(gameHandle, Rect);
 
-  gameX := Left - rect.Left;
-  gameY := Top - rect.Top;
+  gameX := Left - Rect.Left;
+  gameY := Top - Rect.Top;
 
   gameWidth := Width;
   gameHeight := Height;
@@ -943,7 +1048,7 @@ end;
 
 procedure TFormWindow.menuSetWindowNameClick(Sender: TObject);
 begin
-  windowName := InputBox(Application.Title, 'Window Name', windowName);
+  windowName := InputBox(Application.title, 'Window Name', windowName);
 end;
 
 procedure TFormWindow.menuWindowOpacityOnLeaveClick(Sender: TObject);
@@ -952,20 +1057,20 @@ begin
 end;
 
 // Global
-function EnumWindowsProc(hWindow: HWND; _windowIndex:Cardinal): Bool; stdcall;
+function EnumWindowsProc(hWindow: HWND; _windowIndex: Cardinal): Bool; stdcall;
 var
   titleLength: Integer;
   titleChars: PChar;
   title: String;
   visibleWindow: Boolean;
 
-  menuItem : TMenuItem;
+  menuItem: TMenuItem;
 
   HIco: HICON;
   Icon: TIcon;
   iconCount: Integer;
 
-  pid: Cardinal;
+  PID: Cardinal;
   filename: string;
   indexIcon: Word;
 begin
@@ -978,55 +1083,57 @@ begin
     titleLength := GetWindowText(hWindow, titleChars, 255);
     title := titleChars;
 
-    if (titleLength > 0)
-      and (Pos('Evemini', title) = 0)
-      and (visibleWindow)
-      then begin
-          menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
-          menuItem.Caption := title;
-          menuItem.OnClick :=  FormWindow[_windowIndex].menuDefaultClick;
-          menuItem.Tag := hWindow;
+    if (titleLength > 0) and (Pos('Evemini', title) = 0) and (visibleWindow)
+    then
+    begin
+      menuItem := TMenuItem.Create(FormWindow[_windowIndex].menuSelectTarget);
+      menuItem.Caption := title;
+      menuItem.OnClick := FormWindow[_windowIndex].menuDefaultClick;
+      menuItem.Tag := hWindow;
 
+      iconCount := FormWindow[_windowIndex].ImageList.count;
+      // Big icon from window
+      HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
-          iconCount := FormWindow[_windowIndex].imageList.Count;
-          // Big icon from window
-          HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
+      // Small icon from window
+      if HIco = 0 then
+        HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
 
-          // Small icon from window
-          if HIco = 0 then
-            HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
-
-          // Icon from exe-file
-          if HIco = 0 then begin
-            pid := GetPIDByHWnd(hWindow);
-            if pid <> 0 then begin
-              filename := GetPathFromPID(pid);
-              if filename <> NO_PATH then begin
-                HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename), indexIcon);
-              end;
-            end;
+      // Icon from exe-file
+      if HIco = 0 then
+      begin
+        PID := GetPIDByHWnd(hWindow);
+        if PID <> 0 then
+        begin
+          filename := GetPathFromPID(PID);
+          if filename <> NO_PATH then
+          begin
+            HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename),
+              indexIcon);
           end;
-
-          Icon := TIcon.Create;
-          try
-            Icon.ReleaseHandle;
-            Icon.Handle := HIco;
-            FormWindow[_windowIndex].imageList.AddIcon(Icon);
-          finally
-            Icon.Free;
-          end;
-
-
-          if iconCount <> FormWindow[_windowIndex].imageList.Count then
-            menuItem.ImageIndex := FormWindow[_windowIndex].imageList.Count - 1;
-
-          FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
+        end;
       end;
+
+      Icon := TIcon.Create;
+      try
+        Icon.ReleaseHandle;
+        Icon.Handle := HIco;
+        FormWindow[_windowIndex].ImageList.AddIcon(Icon);
+      finally
+        Icon.Free;
+      end;
+
+      if iconCount <> FormWindow[_windowIndex].ImageList.count then
+        menuItem.ImageIndex := FormWindow[_windowIndex].ImageList.count - 1;
+
+      FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
+    end;
 
     FreeMem(titleChars, 256);
   except
     on E: Exception do
-      ShowMessage(E.ClassName + ': ' + E.Message + #13 + E.StackTrace + #13#13 + E.ToString);
+      ShowMessage(E.ClassName + ': ' + E.Message + #13 + E.StackTrace + #13#13 +
+        E.ToString);
   end;
   Result := True;
 end;
@@ -1036,7 +1143,7 @@ const
   STARTUP_IMAGELIST_ICONS_COUNT = 11;
   NO_DATA = -1;
 var
-  index : Integer;
+  index: Integer;
 
   config: string;
   ini: TIniFile;
@@ -1047,20 +1154,18 @@ begin
   menuMinimizeTarget.Enabled := IsWindow(gameHandle);
 
   // Удаляем все окна
-  for index := 1 to menuSelectTarget.Count - 1 do
+  for index := 1 to menuSelectTarget.count - 1 do
     menuSelectTarget.Delete(1);
 
   // Удаляем картинки окон
-  for index := STARTUP_IMAGELIST_ICONS_COUNT to imageList.Count - 1 do
-    imageList.Delete(STARTUP_IMAGELIST_ICONS_COUNT);
+  for index := STARTUP_IMAGELIST_ICONS_COUNT to ImageList.count - 1 do
+    ImageList.Delete(STARTUP_IMAGELIST_ICONS_COUNT);
 
   // Загружаем новые окна
   EnumWindows(@EnumWindowsProc, windowIndex);
 
-
-
   // Удаляем регионы
-  for index := 1 to menuRegions.Count - 3 do
+  for index := 1 to menuRegions.count - 3 do
     menuRegions.Delete(1);
 
   // Добавляем регионы
@@ -1070,14 +1175,20 @@ begin
   try
     count := ini.ReadInteger('options', 'count', 0);
 
-    for index := 1 to count do begin
-      _gameWidth := ini.ReadInteger('region_' + IntToStr(index), 'gameWidth', NO_DATA);
-      _gameHeight := ini.ReadInteger('region_' + IntToStr(index), 'gameHeight', NO_DATA);
-      _gameLeft := ini.ReadInteger('region_' + IntToStr(index), 'gameLeft', NO_DATA);
-      _gameTop := ini.ReadInteger('region_' + IntToStr(index), 'gameTop', NO_DATA);
+    for index := 1 to count do
+    begin
+      _gameWidth := ini.ReadInteger('region_' + IntToStr(index),
+        'gameWidth', NO_DATA);
+      _gameHeight := ini.ReadInteger('region_' + IntToStr(index),
+        'gameHeight', NO_DATA);
+      _gameLeft := ini.ReadInteger('region_' + IntToStr(index),
+        'gameLeft', NO_DATA);
+      _gameTop := ini.ReadInteger('region_' + IntToStr(index),
+        'gameTop', NO_DATA);
 
-      if (_gameWidth = NO_DATA) or (_gameHeight = NO_DATA)
-      or (_gameLeft = NO_DATA) or (_gameTop = NO_DATA) then Continue;
+      if (_gameWidth = NO_DATA) or (_gameHeight = NO_DATA) or
+        (_gameLeft = NO_DATA) or (_gameTop = NO_DATA) then
+        Continue;
 
       Inc(countInserted);
 
@@ -1086,8 +1197,9 @@ begin
       menuItem.gameHeight := _gameHeight;
       menuItem.gameLeft := _gameLeft;
       menuItem.gameTop := _gameTop;
-      menuItem.Caption := ini.ReadString('region_' + IntToStr(index), 'name', 'NO_DATA');
-      menuItem.OnClick :=  menuSelectRegionClick;
+      menuItem.Caption := ini.ReadString('region_' + IntToStr(index), 'name',
+        'NO_DATA');
+      menuItem.OnClick := menuSelectRegionClick;
       menuRegions.Insert(countInserted, menuItem);
     end;
   finally
@@ -1098,9 +1210,12 @@ end;
 
 procedure TFormWindow.FormDblClick(Sender: TObject);
 begin
-  if WindowState = wsMaximized then begin
+  if WindowState = wsMaximized then
+  begin
     WindowState := wsNormal;
-  end else begin
+  end
+  else
+  begin
     WindowState := wsMaximized;
   end;
 
@@ -1110,35 +1225,43 @@ end;
 procedure TFormWindow.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if not (ssAlt in Shift) then Exit;
+  if not(ssAlt in Shift) then
+    Exit;
 
-  if not menuWindowSizable.Checked then Exit;
+  if not menuWindowSizable.Checked then
+    Exit;
 
   case Key of
-    Ord('1'): begin
-      Width := Round(gameWidth / 2);
-      Height := Round(gameHeight / 2);
-    end;
-    Ord('2'): begin
-      Width := gameWidth;
-      Height := gameHeight;
-    end;
-    Ord('3'): begin
-      Width := gameWidth * 2;
-      Height := gameHeight * 2;
-    end;
-    Ord('4'): begin
-      Width := gameWidth * 3;
-      Height := gameHeight * 3;
-    end;
+    Ord('1'):
+      begin
+        Width := Round(gameWidth / 2);
+        Height := Round(gameHeight / 2);
+      end;
+    Ord('2'):
+      begin
+        Width := gameWidth;
+        Height := gameHeight;
+      end;
+    Ord('3'):
+      begin
+        Width := gameWidth * 2;
+        Height := gameHeight * 2;
+      end;
+    Ord('4'):
+      begin
+        Width := gameWidth * 3;
+        Height := gameHeight * 3;
+      end;
   end;
 
   saveProportion;
 
   borderThumbnail(gameHandle = GetForegroundWindow);
 
-  if (Left < 0) or (Left > Screen.Width) then Left := 0;
-  if (Top < 0) or (Top > Screen.Height) then Top := 0;
+  if (Left < 0) or (Left > Screen.Width) then
+    Left := 0;
+  if (Top < 0) or (Top > Screen.Height) then
+    Top := 0;
 end;
 
 procedure TFormWindow.FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -1151,7 +1274,8 @@ begin
 
   mouseDown := Point(X, Y);
 
-  if ssAlt in Shift then begin
+  if ssAlt in Shift then
+  begin
     FormOverlay.Show(BoundsRect);
 
     Exit;
@@ -1159,22 +1283,27 @@ begin
 
   _formPosition := Point(Left, Top);
   // Move form
-  if (Button = mbLeft) and (menuWindowMovable.Checked) then begin
+  if (Button = mbLeft) and (menuWindowMovable.Checked) then
+  begin
     ReleaseCapture;
     SendMessage(Handle, WM_SYSCOMMAND, 61458, 0);
   end;
 
-  if Button = mbLeft then begin
-    if(_formPosition = Point(Left, Top)) then begin
-      if (IsIconic(gameHandle)) then begin
-         ShowWindow(gameHandle, SW_RESTORE);
+  if Button = mbLeft then
+  begin
+    if (_formPosition = Point(Left, Top)) then
+    begin
+      if (IsIconic(gameHandle)) then
+      begin
+        ShowWindow(gameHandle, SW_RESTORE);
       end;
 
       // Form do not change position
       SetForegroundWindow(gameHandle);
     end;
   end
-  else if Button = mbMiddle then Close();
+  else if Button = mbMiddle then
+    Close();
 end;
 
 procedure TFormWindow.FormMouseEnter(Sender: TObject);
@@ -1188,8 +1317,8 @@ begin
     AlphaBlend := True;
 end;
 
-procedure TFormWindow.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+procedure TFormWindow.FormMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
 var
   mouseMove: TPoint;
 begin
@@ -1204,11 +1333,13 @@ end;
 procedure TFormWindow.FormMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
-  x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth, _gameHeight: double;
+  x1, x2, y1, y2, gameXend, gameYend, _gameX, _gameY, _gameWidth,
+    _gameHeight: double;
 begin
   FormOverlay.Hide;
 
-  if not (ssAlt in Shift) then Exit;
+  if not(ssAlt in Shift) then
+    Exit;
 
   gameXend := gameX + gameWidth;
   gameYend := gameY + gameHeight;
@@ -1218,19 +1349,21 @@ begin
   y1 := Min(mouseDown.Y, Y);
   y2 := Max(mouseDown.Y, Y);
 
-  if (Abs(x1 - x2) < 20) or (Abs(y1 - y2) < 20) then Exit;
+  if (Abs(x1 - x2) < 20) or (Abs(y1 - y2) < 20) then
+    Exit;
 
   _gameX := (x1 * gameXend - x1 * gameX + Width * gameX) / Width;
   _gameY := (y1 * gameYend - y1 * gameY + Height * gameY) / Height;
 
   _gameWidth := (x2 * gameXend - x2 * gameX + Width * gameX) / Width - _gameX;
-  _gameHeight := (y2 * gameYend - y2 * gameY + Height * gameY) / Height - _gameY;
+  _gameHeight := (y2 * gameYend - y2 * gameY + Height * gameY) / Height
+    - _gameY;
 
-  gameX := round(_gameX);
-  gameY := round(_gameY);
+  gameX := Round(_gameX);
+  gameY := Round(_gameY);
 
-  gameWidth := round(_gameWidth);
-  gameHeight := round(_gameHeight);
+  gameWidth := Round(_gameWidth);
+  gameHeight := Round(_gameHeight);
 
   saveProportion();
 end;
@@ -1242,17 +1375,19 @@ const
 var
   direction: Integer;
 begin
-  if not menuWindowSizable.Checked then Exit;
+  if not menuWindowSizable.Checked then
+    Exit;
 
   // - scroll down
   // + scroll up
   direction := Round(WheelDelta / Abs(WheelDelta));
 
-  if menuInvertWheel.Checked then direction := -direction;
+  if menuInvertWheel.Checked then
+    direction := -direction;
 
   Left := Left + Round(direction * Width * DELTA);
   Top := Top + Round(direction * Height * DELTA);
-  Width:= Width - Round(direction * 2 * Width * DELTA);
+  Width := Width - Round(direction * 2 * Width * DELTA);
   Height := Height - Round(direction * 2 * Height * DELTA);
 
   saveProportion();
@@ -1277,7 +1412,8 @@ var
 begin
   inherited;
 
-  if not menuWindowSizable.Checked then Exit;
+  if not menuWindowSizable.Checked then
+    Exit;
 
   if BorderStyle = bsNone then
     with Message, deltaRect do
@@ -1311,13 +1447,22 @@ begin
   SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE or SWP_NOSIZE);
 
   // - AltTab
-  SetWindowLong(Handle, GWL_EXSTYLE,
-                GetWindowLong(Handle, GWL_EXSTYLE) or
-                WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
-
+  SetWindowLong(Handle, GWL_EXSTYLE, GetWindowLong(Handle, GWL_EXSTYLE) or
+    WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
 
   // - TaskBar
   ShowWindow(Application.Handle, SW_HIDE);
+end;
+
+procedure TFormWindow.ShowErrorMessage(s: String);
+begin
+  if (SecondsBetween(Now, lastShowMessageTime) < 60) then
+  begin
+    Exit;
+  end;
+
+  ShowMessage(s);
+  lastShowMessageTime := Now;
 end;
 
 end.

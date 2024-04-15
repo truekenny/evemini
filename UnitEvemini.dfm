@@ -2,17 +2,15 @@ object FormEvemini: TFormEvemini
   Left = 0
   Top = 0
   Caption = 'FormEvemini'
-  ClientHeight = 211
-  ClientWidth = 384
+  ClientHeight = 210
+  ClientWidth = 380
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object TimerCheckForms: TTimer
     Interval = 100
@@ -64,7 +62,6 @@ object FormEvemini: TFormEvemini
   end
   object IdHTTP: TIdHTTP
     IOHandler = IdSSLIOHandlerSocketOpenSSL
-    AllowCookies = True
     ProxyParams.BasicAuthentication = False
     ProxyParams.ProxyPort = 0
     Request.ContentLength = -1
