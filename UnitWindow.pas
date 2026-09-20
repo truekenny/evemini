@@ -1,4 +1,4 @@
-unit UnitWindow;
+п»їunit UnitWindow;
 
 interface
 
@@ -131,10 +131,10 @@ type
 
     PH: HTHUMBNAIL;
 
-    // Выбор региона, MouseDown, MouseUp
+    // Р’С‹Р±РѕСЂ СЂРµРіРёРѕРЅР°, MouseDown, MouseUp
     mouseDown: TPoint;
 
-    // Перемещение формы, WMMoving, MouseUp
+    // РџРµСЂРµРјРµС‰РµРЅРёРµ С„РѕСЂРјС‹, WMMoving, MouseUp
     glueDeltaLeft: Integer;
     glueDeltaTop: Integer;
 
@@ -270,17 +270,17 @@ begin
 
   Rect := Pointer(Message.LParam);
 
-  // Границы дисплея
+  // Р“СЂР°РЅРёС†С‹ РґРёСЃРїР»РµСЏ
   SetLength(leftBorders, 2);
   leftBorders[Length(leftBorders) - 2] := 0;
   leftBorders[Length(leftBorders) - 1] := Screen.Width - Width;
 
-  // Границы дисплея
+  // Р“СЂР°РЅРёС†С‹ РґРёСЃРїР»РµСЏ
   SetLength(topBorders, 2);
   topBorders[Length(topBorders) - 2] := 0;
   topBorders[Length(topBorders) - 1] := Screen.Height - Height;
 
-  // Выбираю граничные значения для Left и Top
+  // Р’С‹Р±РёСЂР°СЋ РіСЂР°РЅРёС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ Left Рё Top
   for index := 0 to Length(FormWindow) - 1 do
   begin
     if index = windowIndex then
@@ -313,23 +313,23 @@ begin
   nearCheckingBorderTop := BREAK_NEAR;
   for index := 0 to Length(leftBorders) - 1 do
   begin
-    // Проверяю левую границу, устанавливаю новое значение Left
+    // РџСЂРѕРІРµСЂСЏСЋ Р»РµРІСѓСЋ РіСЂР°РЅРёС†Сѓ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋ РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Left
     checkingBorder := leftBorders[index];
     if (Rect.Left > checkingBorder - DELTA) and
       (Rect.Left < checkingBorder + DELTA) then
     begin
-      // Ищу наиболее подходящее значение
+      // РС‰Сѓ РЅР°РёР±РѕР»РµРµ РїРѕРґС…РѕРґСЏС‰РµРµ Р·РЅР°С‡РµРЅРёРµ
       if Abs(nearCheckingBorderLeft - Rect.Left) >
         Abs(checkingBorder - Rect.Left) then
         nearCheckingBorderLeft := checkingBorder;
     end;
 
-    // Проверяю верхнюю границу, устанавливаю новое значение Top
+    // РџСЂРѕРІРµСЂСЏСЋ РІРµСЂС…РЅСЋСЋ РіСЂР°РЅРёС†Сѓ, СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋ РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ Top
     checkingBorder := topBorders[index];
     if (Rect.Top > checkingBorder - DELTA) and
       (Rect.Top < checkingBorder + DELTA) then
     begin
-      // Ищу наиболее подходящее значение
+      // РС‰Сѓ РЅР°РёР±РѕР»РµРµ РїРѕРґС…РѕРґСЏС‰РµРµ Р·РЅР°С‡РµРЅРёРµ
       if Abs(nearCheckingBorderTop - Rect.Top) > Abs(checkingBorder - Rect.Top)
       then
         nearCheckingBorderTop := checkingBorder;
@@ -354,7 +354,7 @@ begin
     Rect.Height := middle;
   end;
 
-  // Проверяю не вышел ли курсор за правый предел glue_DELTA границы
+  // РџСЂРѕРІРµСЂСЏСЋ РЅРµ РІС‹С€РµР» Р»Рё РєСѓСЂСЃРѕСЂ Р·Р° РїСЂР°РІС‹Р№ РїСЂРµРґРµР» glue_DELTA РіСЂР°РЅРёС†С‹
   if glueDeltaLeft >= DELTA then
   begin
     glueDeltaLeft := 0;
@@ -364,7 +364,7 @@ begin
     Rect.Width := middle;
   end;
 
-  // Проверяю не вышел ли курсор за левый предел glue_DELTA границы
+  // РџСЂРѕРІРµСЂСЏСЋ РЅРµ РІС‹С€РµР» Р»Рё РєСѓСЂСЃРѕСЂ Р·Р° Р»РµРІС‹Р№ РїСЂРµРґРµР» glue_DELTA РіСЂР°РЅРёС†С‹
   if glueDeltaLeft <= -DELTA then
   begin
     glueDeltaLeft := 0;
@@ -374,7 +374,7 @@ begin
     Rect.Width := middle;
   end;
 
-  // Проверяю не вышел ли курсор за нижний предел glue_DELTA границы
+  // РџСЂРѕРІРµСЂСЏСЋ РЅРµ РІС‹С€РµР» Р»Рё РєСѓСЂСЃРѕСЂ Р·Р° РЅРёР¶РЅРёР№ РїСЂРµРґРµР» glue_DELTA РіСЂР°РЅРёС†С‹
   if glueDeltaTop >= DELTA then
   begin
     glueDeltaTop := 0;
@@ -384,7 +384,7 @@ begin
     Rect.Height := middle;
   end;
 
-  // Проверяю не вышел ли курсор за верхний предел glue_DELTA границы
+  // РџСЂРѕРІРµСЂСЏСЋ РЅРµ РІС‹С€РµР» Р»Рё РєСѓСЂСЃРѕСЂ Р·Р° РІРµСЂС…РЅРёР№ РїСЂРµРґРµР» glue_DELTA РіСЂР°РЅРёС†С‹
   if glueDeltaTop <= -DELTA then
   begin
     glueDeltaTop := 0;
@@ -414,8 +414,8 @@ var
   RegEx: TRegEx;
 begin
   config := windowName;
-  // config := '123-123 - /?\:Test - Тест-ЯяЁёЙй';
-  RegEx.Create('[^0-9a-zA-Zа-яА-Я\-\ ёЁ]');
+  // config := '123-123 - /?\:Test - РўРµСЃС‚-РЇСЏРЃС‘Р™Р№';
+  RegEx.Create('[^0-9a-zA-ZР°-СЏРђ-РЇ\-\ С‘РЃ]');
   config := RegEx.Replace(config, '');
   config := Trim(config);
 
@@ -932,7 +932,7 @@ begin
     gameHeight := Height;
 
   windowName := _windowName;
-  // Надо сохранить конфиг, если он был указан
+  // РќР°РґРѕ СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРЅС„РёРі, РµСЃР»Рё РѕРЅ Р±С‹Р» СѓРєР°Р·Р°РЅ
   if _config <> '' then
     config := _config;
 
@@ -940,7 +940,7 @@ begin
 
   AlphaBlend := menuWindowOpacityOnLeave.Checked;
 
-  // При инициализации окно видно, если не выбрано окно для просмотра
+  // РџСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РѕРєРЅРѕ РІРёРґРЅРѕ, РµСЃР»Рё РЅРµ РІС‹Р±СЂР°РЅРѕ РѕРєРЅРѕ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°
   Visible := windowName = '';
 
   if mutex <> 0 then
@@ -1132,7 +1132,7 @@ begin
     FreeMem(titleChars, 256);
   except
     on E: Exception do
-      ShowMessage(E.ClassName + ': ' + E.Message + #13 + E.StackTrace + #13#13 +
+      ShowMessage(E.ClassName + ' (global enum): ' + E.Message + #13 + E.StackTrace + #13#13 +
         E.ToString);
   end;
   Result := True;
@@ -1153,22 +1153,22 @@ var
 begin
   menuMinimizeTarget.Enabled := IsWindow(gameHandle);
 
-  // Удаляем все окна
+  // РЈРґР°Р»СЏРµРј РІСЃРµ РѕРєРЅР°
   for index := 1 to menuSelectTarget.count - 1 do
     menuSelectTarget.Delete(1);
 
-  // Удаляем картинки окон
+  // РЈРґР°Р»СЏРµРј РєР°СЂС‚РёРЅРєРё РѕРєРѕРЅ
   for index := STARTUP_IMAGELIST_ICONS_COUNT to ImageList.count - 1 do
     ImageList.Delete(STARTUP_IMAGELIST_ICONS_COUNT);
 
-  // Загружаем новые окна
+  // Р—Р°РіСЂСѓР¶Р°РµРј РЅРѕРІС‹Рµ РѕРєРЅР°
   EnumWindows(@EnumWindowsProc, windowIndex);
 
-  // Удаляем регионы
+  // РЈРґР°Р»СЏРµРј СЂРµРіРёРѕРЅС‹
   for index := 1 to menuRegions.count - 3 do
     menuRegions.Delete(1);
 
-  // Добавляем регионы
+  // Р”РѕР±Р°РІР»СЏРµРј СЂРµРіРёРѕРЅС‹
   countInserted := 0;
   config := ExtractFilePath(ParamStr(0)) + 'regions.ini';
   ini := TIniFile.Create(config);
@@ -1461,7 +1461,7 @@ begin
     Exit;
   end;
 
-  ShowMessage(s);
+  ShowMessage(fWindowName + #13 + s);
   lastShowMessageTime := Now;
 end;
 

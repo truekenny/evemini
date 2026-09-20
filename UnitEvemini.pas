@@ -1,4 +1,4 @@
-unit UnitEvemini;
+﻿unit UnitEvemini;
 
 interface
 
@@ -30,7 +30,7 @@ uses
 
 const
   WM_ICONTRAY = WM_USER + 1;
-  CURRENT_RELEASE = 'Release #11';
+  CURRENT_RELEASE = 'Release #12';
 
 type
   TFormEvemini = class(TForm)
