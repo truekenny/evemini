@@ -30,7 +30,9 @@ uses
   Winapi.DwmApi,
   Winapi.Messages,
   Winapi.ShellApi,
-  Winapi.Windows;
+  Winapi.Windows,
+  System.IOUtils,
+  System.SyncObjs;
 
 type
   TMenuItemRegion = class(TMenuItem)
@@ -168,6 +170,7 @@ type
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem;
       var CanClose: Boolean);
     procedure ShowErrorMessage(s: String);
+    procedure AppendLineSafe(const ALine: string);
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string;
@@ -180,10 +183,28 @@ type
 
 var
   FormWindow: array of TFormWindow;
+  LogLock: TCriticalSection;
 
 implementation
 
 {$R *.dfm}
+
+procedure TFormWindow.AppendLineSafe(const ALine: string);
+var
+  FilePath: string;
+begin
+  // Формируем путь к файлу в директории запущенного exe-файла
+  FilePath := TPath.Combine(ExtractFilePath(ParamStr(0)), 'log.txt');
+
+  LogLock.Enter; // Блокируем доступ для других потоков
+  try
+    // Дописываем строку с переносом на новую в кодировке UTF-8
+    TFile.AppendAllText(FilePath, FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)
+      + ' ' +  ALine + #13'fWindowName=' + fWindowName + sLineBreak, TEncoding.UTF8);
+  finally
+    LogLock.Leave; // Обязательно освобождаем блокировку
+  end;
+end;
 
 procedure TFormWindow.setWindowName(str: string);
 begin
@@ -477,7 +498,22 @@ end;
 
 procedure TFormWindow.TimerTimer(Sender: TObject);
 begin
-  fresh;
+  try
+    fresh;
+  except
+    on E: Exception do begin
+      AppendLineSafe('1. ' + E.Message + #13 + E.StackTrace);
+      try
+        Timer.Interval := 1000;
+        gameHandle := 0;
+        DwmUnregisterThumbnail(PH);
+      except
+        on E: Exception do begin
+          AppendLineSafe('2. ' + E.Message + #13 + E.StackTrace);
+        end;
+      end;
+    end;
+  end;
 end;
 
 procedure TFormWindow.fresh;
@@ -705,6 +741,8 @@ begin
   PopupMenu.OnTrackMenuNotify := TrackMenuNotifyHandler;
 
   lastForegroundStatus := True;
+
+  AppendLineSafe('0. Create');
 end;
 
 procedure TFormWindow.writeConfig(filename: string);
@@ -1469,5 +1507,11 @@ begin
   ShowMessage(fWindowName + #13 + s);
   lastShowMessageTime := Now;
 end;
+
+initialization
+  LogLock := TCriticalSection.Create;
+
+finalization
+  LogLock.Free;
 
 end.
