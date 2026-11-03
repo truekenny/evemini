@@ -1092,35 +1092,40 @@ begin
       menuItem.Tag := hWindow;
 
       iconCount := FormWindow[_windowIndex].ImageList.count;
-      // Big icon from window
-      HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
-      // Small icon from window
-      if HIco = 0 then
-        HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
+      try
+        // Big icon from window
+        HIco := SendMessage(hWindow, WM_GETICON, ICON_BIG, 0);
 
-      // Icon from exe-file
-      if HIco = 0 then
-      begin
-        PID := GetPIDByHWnd(hWindow);
-        if PID <> 0 then
+        // Small icon from window
+        if HIco = 0 then
+          HIco := SendMessage(hWindow, WM_GETICON, ICON_SMALL2, 0);
+
+        // Icon from exe-file
+        if HIco = 0 then
         begin
-          filename := GetPathFromPID(PID);
-          if filename <> NO_PATH then
+          PID := GetPIDByHWnd(hWindow);
+          if PID <> 0 then
           begin
-            HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename),
-              indexIcon);
+            filename := GetPathFromPID(PID);
+            if filename <> NO_PATH then
+            begin
+              HIco := ExtractAssociatedIcon(Application.Handle, PChar(filename),
+                indexIcon);
+            end;
           end;
         end;
-      end;
 
-      Icon := TIcon.Create;
-      try
-        Icon.ReleaseHandle;
-        Icon.Handle := HIco;
-        FormWindow[_windowIndex].ImageList.AddIcon(Icon);
+        Icon := TIcon.Create;
+        try
+          Icon.ReleaseHandle;
+          Icon.Handle := HIco;
+          FormWindow[_windowIndex].ImageList.AddIcon(Icon);
+        finally
+          Icon.Free;
+        end;
       finally
-        Icon.Free;
+
       end;
 
       if iconCount <> FormWindow[_windowIndex].ImageList.count then
