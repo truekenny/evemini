@@ -1260,7 +1260,7 @@ end;
 procedure TFormWindow.PopupMenuPopup(Sender: TObject);
 begin
   try
-  _PopupMenuPopup();
+    _PopupMenuPopup();
   except
     on E: Exception do begin
       AppendLineSafe('PopupMenuPopup1. ' + E.Message + ' fWindowName=' + fWindowName);
