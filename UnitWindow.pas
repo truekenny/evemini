@@ -34,6 +34,9 @@ uses
   System.IOUtils,
   System.SyncObjs;
 
+const
+  MEM_SIZE = 10000;
+
 type
   TMenuItemRegion = class(TMenuItem)
   private
@@ -170,7 +173,6 @@ type
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem;
       var CanClose: Boolean);
     procedure ShowErrorMessage(s: String);
-    procedure AppendLineSafe(const ALine: string);
     procedure _PopupMenuPopup();
   public
     { Public declarations }
@@ -190,7 +192,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TFormWindow.AppendLineSafe(const ALine: string);
+procedure AppendLineSafe(const ALine: string);
 var
   FilePath: string;
 begin
@@ -201,7 +203,7 @@ begin
   try
     // Дописываем строку с переносом на новую в кодировке UTF-8
     TFile.AppendAllText(FilePath, FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', Now)
-      + ' ' +  ALine + #13'fWindowName=' + fWindowName + sLineBreak, TEncoding.UTF8);
+      + ' ' +  ALine + sLineBreak, TEncoding.UTF8);
   finally
     LogLock.Leave; // Обязательно освобождаем блокировку
   end;
@@ -459,11 +461,12 @@ begin
   Result := True;
 
   try
-    GetMem(titleChars, 256);
+    GetMem(titleChars, MEM_SIZE);
+    ZeroMemory(titleChars, MEM_SIZE);
 
     visibleWindow := IsWindowVisible(hWindow);
 
-    titleLength := GetWindowText(hWindow, titleChars, 255);
+    titleLength := GetWindowText(hWindow, titleChars, MEM_SIZE - 10);
     title := titleChars;
     subWindowName := Copy(FormWindow[_windowIndex].windowName, 2);
 
@@ -474,7 +477,7 @@ begin
       FormWindow[_windowIndex].getHandlerResult := hWindow;
     end;
 
-    FreeMem(titleChars, 256);
+    FreeMem(titleChars, MEM_SIZE);
   except
     on E: Exception do
       ShowMessage(E.ClassName + ' (search): ' + E.Message + #13 + E.StackTrace +
@@ -503,14 +506,14 @@ begin
     fresh;
   except
     on E: Exception do begin
-      AppendLineSafe('TimerTimer1. ' + E.Message);
+      AppendLineSafe('TimerTimer1. ' + E.Message + ' fWindowName=' + fWindowName);
       try
         Timer.Interval := 1000;
         gameHandle := 0;
         DwmUnregisterThumbnail(PH);
       except
         on E: Exception do begin
-          AppendLineSafe('TimerTimer2. ' + E.Message);
+          AppendLineSafe('TimerTimer2. ' + E.Message + ' fWindowName=' + fWindowName);
         end;
       end;
     end;
@@ -743,7 +746,7 @@ begin
 
   lastForegroundStatus := True;
 
-  AppendLineSafe('0. Create');
+  AppendLineSafe('0. Create'+ ' fWindowName=' + fWindowName);
 end;
 
 procedure TFormWindow.writeConfig(filename: string);
@@ -1115,11 +1118,12 @@ var
 begin
   try
     indexIcon := 0;
-    GetMem(titleChars, 256);
+    GetMem(titleChars, MEM_SIZE);
+    ZeroMemory(titleChars, MEM_SIZE);
 
     visibleWindow := IsWindowVisible(hWindow);
 
-    titleLength := GetWindowText(hWindow, titleChars, 255);
+    titleLength := GetWindowText(hWindow, titleChars, MEM_SIZE - 10);
     title := titleChars;
 
     if (titleLength > 0) and (Pos('Evemini', title) = 0) and (visibleWindow)
@@ -1163,8 +1167,10 @@ begin
         finally
           Icon.Free;
         end;
-      finally
-
+      except
+        on E: Exception do begin
+          AppendLineSafe('Icon');
+        end;
       end;
 
       if iconCount <> FormWindow[_windowIndex].ImageList.count then
@@ -1173,7 +1179,7 @@ begin
       FormWindow[_windowIndex].menuSelectTarget.Add(menuItem);
     end;
 
-    FreeMem(titleChars, 256);
+    FreeMem(titleChars, MEM_SIZE);
   except
     on E: Exception do
       ShowMessage(E.ClassName + ' (global enum): ' + E.Message + #13 + E.StackTrace + #13#13 +
@@ -1257,14 +1263,14 @@ begin
   _PopupMenuPopup();
   except
     on E: Exception do begin
-      AppendLineSafe('PopupMenuPopup1. ' + E.Message);
+      AppendLineSafe('PopupMenuPopup1. ' + E.Message + ' fWindowName=' + fWindowName);
       try
         Timer.Interval := 1000;
         gameHandle := 0;
         DwmUnregisterThumbnail(PH);
       except
         on E: Exception do begin
-          AppendLineSafe('PopupMenuPopup2. ' + E.Message);
+          AppendLineSafe('PopupMenuPopup2. ' + E.Message + ' fWindowName=' + fWindowName);
         end;
       end;
     end;
