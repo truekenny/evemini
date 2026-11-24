@@ -171,6 +171,7 @@ type
       var CanClose: Boolean);
     procedure ShowErrorMessage(s: String);
     procedure AppendLineSafe(const ALine: string);
+    procedure _PopupMenuPopup();
   public
     { Public declarations }
     procedure initialize(_windowIndex: Integer; params: array of string;
@@ -502,14 +503,14 @@ begin
     fresh;
   except
     on E: Exception do begin
-      AppendLineSafe('1. ' + E.Message + #13 + E.StackTrace);
+      AppendLineSafe('TimerTimer1. ' + E.Message);
       try
         Timer.Interval := 1000;
         gameHandle := 0;
         DwmUnregisterThumbnail(PH);
       except
         on E: Exception do begin
-          AppendLineSafe('2. ' + E.Message + #13 + E.StackTrace);
+          AppendLineSafe('TimerTimer2. ' + E.Message);
         end;
       end;
     end;
@@ -1181,7 +1182,7 @@ begin
   Result := True;
 end;
 
-procedure TFormWindow.PopupMenuPopup(Sender: TObject);
+procedure TFormWindow._PopupMenuPopup();
 const
   STARTUP_IMAGELIST_ICONS_COUNT = 11;
   NO_DATA = -1;
@@ -1248,7 +1249,26 @@ begin
   finally
     ini.Free;
   end;
+end;
 
+procedure TFormWindow.PopupMenuPopup(Sender: TObject);
+begin
+  try
+  _PopupMenuPopup();
+  except
+    on E: Exception do begin
+      AppendLineSafe('PopupMenuPopup1. ' + E.Message);
+      try
+        Timer.Interval := 1000;
+        gameHandle := 0;
+        DwmUnregisterThumbnail(PH);
+      except
+        on E: Exception do begin
+          AppendLineSafe('PopupMenuPopup2. ' + E.Message);
+        end;
+      end;
+    end;
+  end;
 end;
 
 procedure TFormWindow.FormDblClick(Sender: TObject);
